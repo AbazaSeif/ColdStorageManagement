@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane layoutX="0.0" layoutY="0.0" prefHeight="-1.0" prefWidth="-1.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2">
+  <children>
+    <Pane layoutX="-2.0" layoutY="0.0" prefHeight="500.0" prefWidth="-1.0" />
+    <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="32.0" scaleX="1.0" scaleY="0.9999937347040251" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Cold ID" textAlignment="CENTER" underline="false">
+      <fill>
+        <Color blue="0.000" green="0.200" red="0.688" fx:id="x1" />
+      </fill>
+      <font>
+        <Font name="Gadugi" size="12.0" fx:id="x2" />
+      </font>
+      <rotationAxis>
+        <Point3D x="1.0" y="1.0" z="1.0" fx:id="x3" />
+      </rotationAxis>
+    </Text>
+    <TextField layoutX="86.0" layoutY="16.0" prefWidth="144.9978125" />
+    <TableView fx:id="stockTable" layoutX="12.0" layoutY="50.0" prefHeight="201.0" prefWidth="451.0">
+      <columns>
+        <TableColumn prefWidth="75.0" text="Date" fx:id="stockDate" />
+        <TableColumn prefWidth="75.0" text="Cold No" fx:id="stockColdNo" />
+        <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="75.0" text="Party Id" fx:id="stockPartyId" />
+        <TableColumn prefWidth="75.0" text="Balance" fx:id="stockBalance" />
+        <TableColumn prefWidth="75.0" text="Floor No" fx:id="stockFloorNo" />
+        <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="75.0" text="Rack No" fx:id="stockRackNo" />
+      </columns>
+    </TableView>
+    <Button layoutX="248.0" layoutY="16.0" mnemonicParsing="false" text="Search" />
+  </children>
+</AnchorPane>

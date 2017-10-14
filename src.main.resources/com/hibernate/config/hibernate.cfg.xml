@@ -1,0 +1,24 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD//EN"
+    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory name="coldStorage">
+		<property name="hibernate.connection.driver_class">
+			oracle.jdbc.driver.OracleDriver
+		</property>
+		<property name="hibernate.connection.url">jdbc:oracle:thin:@127.0.0.1:1521:XE</property>
+		<property name="hibernate.connection.username">MOHAK
+		</property>
+		<property name="hibernate.connection.password">mohak
+		</property>
+		<property name="connection.pool_size">5</property>
+		<!-- SQL dialect -->
+		<property name="hibernate.dialect">
+			org.hibernate.dialect.Oracle10gDialect
+		</property>
+		<!-- Echo all executed SQL to stdout -->
+		<property name="show_sql">true</property>
+		<property name="hbm2ddl.auto">update</property>
+		<mapping resource="./com/hibernate/config/InwardInventory.hbm.xml" />
+	</session-factory>
+</hibernate-configuration>

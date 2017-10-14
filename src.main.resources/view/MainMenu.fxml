@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane blendMode="GREEN" xmlns:fx="http://javafx.com/fxml/1"
+	xmlns="http://javafx.com/javafx/2.2" fx:controller="com.mg.controller.LoadTabFxmlActionController">
+	<!-- TODO Add Nodes -->
+	<children>
+		<TabPane layoutX="0.0" layoutY="0.0" minHeight="-Infinity"
+			minWidth="-Infinity">
+			<tabs>
+				<Tab closable="false" text="Inward Inventory">
+					<content>
+						<fx:include fx:id="inwardInventory" source="InwardInventory.fxml" />
+					</content>
+				</Tab>
+				<Tab closable="false" text="Outward Inventory">
+					<content>
+						<fx:include fx:id="outwardInventory" source="OutwardInventory.fxml" />
+					</content>
+				</Tab>
+				<Tab closable="false" text="Stock Tally">
+					<content>
+						<fx:include fx:id="stockTally" source="StockTally.fxml" />
+					</content>
+				</Tab>
+				<Tab closable="false" text="Billing">
+					<content>
+						<fx:include fx:id="billing" source="Billing.fxml" />
+					</content>
+				</Tab>
+				<Tab closable="false" text="Customers">
+					<content>
+						<fx:include fx:id="customerDetails" source="CutomerDetails.fxml" />
+					</content>
+				</Tab>
+			</tabs>
+		</TabPane>
+	</children>
+</AnchorPane>
