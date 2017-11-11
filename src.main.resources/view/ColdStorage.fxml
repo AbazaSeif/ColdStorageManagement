@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane layoutX="0.0" layoutY="0.0" prefHeight="334.0000999999975" prefWidth="483.000009765625" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.mg.controller.ColdVyaapariController">
+  <!-- TODO Add Nodes -->
+  <children>
+    <Pane layoutX="-2.0" layoutY="0.0" prefHeight="500.0" prefWidth="-1.0" />
+    <TabPane layoutX="14.0" layoutY="14.0" prefHeight="306.0000915527344" prefWidth="456.997802734375" tabClosingPolicy="ALL_TABS">
+      <tabs>
+        <Tab fx:id="addColdStorage" closable="false" text="Add New Cold Storage">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <children>
+                <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="37.0" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Date" textAlignment="CENTER" underline="false">
+                  <fill>
+                    <Color blue="0.000" green="0.200" red="0.688" fx:id="x1" />
+                  </fill>
+                  <font>
+                    <Font name="Gadugi" size="12.0" fx:id="x2" />
+                  </font>
+                  <rotationAxis>
+                    <Point3D x="1.0" y="1.0" z="1.0" fx:id="x3" />
+                  </rotationAxis>
+                </Text>
+                <TextField fx:id="cold_date" layoutX="104.0" layoutY="20.0" prefWidth="144.9978125" promptText="dd-mm-yyyy" />
+                <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="14.0" layoutY="58.0" rotationAxis="$x3" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Cold Name" textAlignment="CENTER" underline="false" />
+                <TextField fx:id="cold_name" layoutX="104.0" layoutY="42.0" prefWidth="144.9978125" />
+                <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="14.0" layoutY="80.0" rotationAxis="$x3" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Cold Address" textAlignment="CENTER" underline="false" />
+                <TextField fx:id="cold_add" layoutX="104.0" layoutY="64.0" prefWidth="145.0" promptText="Complete Address" />
+                <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="16.0" layoutY="101.0" rotationAxis="$x3" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Phone No" textAlignment="CENTER" underline="false" />
+                <TextField fx:id="cold_phone" layoutX="104.0" layoutY="87.0" prefWidth="144.9978125" promptText="9999999999" />
+                <Button layoutX="76.0" layoutY="150.0" mnemonicParsing="false" onAction="#addColdStorage" text="Add Cold Storage" />
+                <Text fx:id="successMessage" layoutX="56.0" layoutY="204.0" strokeType="OUTSIDE" strokeWidth="0.0" text="">
+                  <fill>
+                    <Color blue="0.384" green="0.000" red="0.800" fx:id="x4" />
+                  </fill>
+                </Text>
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+        <Tab fx:id="addVyaapari" closable="false" text="Add New Vyaapari">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <children>
+                <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="14.0" layoutY="37.0" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Date" textAlignment="CENTER" underline="false">
+                  <rotationAxis>
+                    <Point3D x="1.0" y="1.0" z="1.0" fx:id="x3" />
+                  </rotationAxis>
+                </Text>
+                <TextField id="cust_date" fx:id="vyaapariDate" layoutX="107.0" layoutY="20.0" prefWidth="144.9978125" promptText="dd-mm-yyyy" />
+                <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="14.0" layoutY="58.0" rotationAxis="$x3" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Vyaapari Name" textAlignment="CENTER" underline="false" />
+                <TextField fx:id="vyaapariName" layoutX="107.0" layoutY="42.0" prefWidth="144.9978125" />
+                <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="14.0" layoutY="80.0" rotationAxis="$x3" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Vyaapari Address" textAlignment="CENTER" underline="false" />
+                <TextField  fx:id="vyaapariAddress" layoutX="107.0" layoutY="64.0" prefWidth="145.0" promptText="Complete Address" />
+                <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="16.0" layoutY="101.0" rotationAxis="$x3" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Phone No" textAlignment="CENTER" underline="false" />
+                <TextField  fx:id="vyaapariNumber" layoutX="107.0" layoutY="87.0" prefWidth="144.9978125" promptText="9999999999" />
+                <Button layoutX="76.0" layoutY="150.0" mnemonicParsing="false" onAction="#addVyaapari" text="Add Vyaapari" />
+                <Text fx:id="successMessage1" fill="$x4" layoutX="56.0" layoutY="204.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" />
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+      </tabs>
+    </TabPane>
+  </children>
+</AnchorPane>

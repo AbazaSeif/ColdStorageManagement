@@ -4,7 +4,7 @@ package com.mg.csms.beans;
  * @author Mohak Gupta
  *
  */
-public class PartyContact {
+public class Contact {
 
 	private String address;
 	private Long phoneNo;

@@ -19,6 +19,8 @@
 		<!-- Echo all executed SQL to stdout -->
 		<property name="show_sql">true</property>
 		<property name="hbm2ddl.auto">update</property>
-		<mapping resource="./com/hibernate/config/InwardInventory.hbm.xml" />
+		<mapping resource="./com/hibernate/config/ColdStorage.hbm.xml" />
+		<mapping resource="./com/hibernate/config/Vyaapari.hbm.xml" />
+		<mapping resource="./com/hibernate/config/InwardStock.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

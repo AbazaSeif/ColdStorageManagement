@@ -1,18 +1,34 @@
 package com.mg.csms.beans;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
-public class InwardStock {
+/**
+ * @author Mohak Gupta
+ *
+ */
+public class InwardStock extends InwardStockItem implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+
+	private Integer stockId;
 	private Date date;
-	private Integer hsnCode;
-	private String itemName;
-	private String partyId;
-	private Integer coldId;
-	private Integer lotNo;
+	private String coldName;
+	private String vyaapariName;
 	private Integer qty;
-	private Integer balanceQty;
-	private Integer bardana;
+	private String gadiNo;
+	private List<InwardStockItem> inwardStockList;
+
+	@Override
+	public Integer getStockId() {
+		return stockId;
+	}
+
+	@Override
+	public void setStockId(Integer stockId) {
+		this.stockId = stockId;
+	}
 
 	public Date getDate() {
 		return date;
@@ -22,44 +38,20 @@ public class InwardStock {
 		this.date = date;
 	}
 
-	public Integer getHsnCode() {
-		return hsnCode;
+	public String getColdName() {
+		return coldName;
 	}
 
-	public void setHsnCode(Integer hsnCode) {
-		this.hsnCode = hsnCode;
+	public void setColdName(String coldName) {
+		this.coldName = coldName;
 	}
 
-	public String getItemName() {
-		return itemName;
+	public String getVyaapariName() {
+		return vyaapariName;
 	}
 
-	public void setItemName(String itemName) {
-		this.itemName = itemName;
-	}
-
-	public String getPartyId() {
-		return partyId;
-	}
-
-	public void setPartyId(String partyId) {
-		this.partyId = partyId;
-	}
-
-	public Integer getColdId() {
-		return coldId;
-	}
-
-	public void setColdId(Integer coldId) {
-		this.coldId = coldId;
-	}
-
-	public Integer getLotNo() {
-		return lotNo;
-	}
-
-	public void setLotNo(Integer lotNo) {
-		this.lotNo = lotNo;
+	public void setVyaapariName(String vyaapariName) {
+		this.vyaapariName = vyaapariName;
 	}
 
 	public Integer getQty() {
@@ -70,20 +62,20 @@ public class InwardStock {
 		this.qty = qty;
 	}
 
-	public Integer getBalanceQty() {
-		return balanceQty;
+	public String getGadiNo() {
+		return gadiNo;
 	}
 
-	public void setBalanceQty(Integer balanceQty) {
-		this.balanceQty = balanceQty;
+	public void setGadiNo(String gadiNo) {
+		this.gadiNo = gadiNo;
 	}
 
-	public Integer getBardana() {
-		return bardana;
+	public List<InwardStockItem> getInwardStockList() {
+		return inwardStockList;
 	}
 
-	public void setBardana(Integer bardana) {
-		this.bardana = bardana;
+	public void setInwardStockList(List<InwardStockItem> inwardStockList) {
+		this.inwardStockList = inwardStockList;
 	}
 
 }

@@ -14,6 +14,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 
+/**
+ * @author Mohak Gupta
+ *
+ */
 public class LoginController {
 	@FXML
 	private AnchorPane apDesignPane;
