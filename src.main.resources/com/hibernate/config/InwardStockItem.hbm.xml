@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.mg.csms.beans.InwardStockItem" table="LOT_ENTRY">
+		<id name="recordId" type="integer" column="RECORD_ID">
+			<generator class="increment" />
+		</id>
+		
+		<property name="lotNo" column="LOT_NO" />
+		<property name="coldNo" column="COLD_NUMBER" />
+		<property name="quantity" column="QUANTITY" />
+		<property name="item" column="ITEM_NAME" />
+		<property name="rate" column="RATE" />
+		<property name="entryDate" column="ENTRY_DATE" />
+		<property name="gadiNo" column="GADI_NO" />
+		<many-to-one name="inwardStock" class="com.mg.csms.beans.InwardStock" fetch="select">
+            <column name="STOCK_ID" not-null="true" />
+        </many-to-one>
+	</class>
+</hibernate-mapping>

@@ -1,31 +1,29 @@
 package com.mg.csms.beans;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 /**
  * @author Mohak Gupta
  *
  */
-public class InwardStock extends InwardStockItem implements Serializable {
+public class InwardStock implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private Integer stockId;
 	private Date date;
-	private String coldName;
-	private String vyaapariName;
+	private Integer coldId;
+	private Integer vyaapariId;
 	private Integer qty;
 	private String gadiNo;
 	private List<InwardStockItem> inwardStockList;
 
-	@Override
 	public Integer getStockId() {
 		return stockId;
 	}
 
-	@Override
 	public void setStockId(Integer stockId) {
 		this.stockId = stockId;
 	}
@@ -38,20 +36,20 @@ public class InwardStock extends InwardStockItem implements Serializable {
 		this.date = date;
 	}
 
-	public String getColdName() {
-		return coldName;
+	public Integer getColdId() {
+		return coldId;
 	}
 
-	public void setColdName(String coldName) {
-		this.coldName = coldName;
+	public void setColdId(Integer coldId) {
+		this.coldId = coldId;
 	}
 
-	public String getVyaapariName() {
-		return vyaapariName;
+	public Integer getVyaapariId() {
+		return vyaapariId;
 	}
 
-	public void setVyaapariName(String vyaapariName) {
-		this.vyaapariName = vyaapariName;
+	public void setVyaapariId(Integer vyaapariId) {
+		this.vyaapariId = vyaapariId;
 	}
 
 	public Integer getQty() {

@@ -22,5 +22,7 @@
 		<mapping resource="./com/hibernate/config/ColdStorage.hbm.xml" />
 		<mapping resource="./com/hibernate/config/Vyaapari.hbm.xml" />
 		<mapping resource="./com/hibernate/config/InwardStock.hbm.xml" />
+		<mapping resource="./com/hibernate/config/InwardStockItem.hbm.xml" />
+		<mapping resource="./com/hibernate/config/Demand.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

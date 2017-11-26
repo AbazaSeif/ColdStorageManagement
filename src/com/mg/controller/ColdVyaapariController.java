@@ -2,7 +2,9 @@ package com.mg.controller;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -11,9 +13,13 @@ import com.mg.csms.beans.ColdStorage;
 import com.mg.csms.beans.Vyaapari;
 import com.mg.csms.database.SessionCreation;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 
 /**
@@ -40,6 +46,27 @@ public class ColdVyaapariController {
 	private TextField vyaapariNumber;
 
 	@FXML
+	private TableView<ColdStorage> coldListView;
+	@FXML
+	private TableColumn<ColdStorage, String> listColdName;
+	@FXML
+	private TableColumn<ColdStorage, String> listColdPhone;
+	@FXML
+	private TableColumn<ColdStorage, String> listColdAddress;
+
+	@FXML
+	private TableView<Vyaapari> vyaapariListView;
+	@FXML
+	private TableColumn<Vyaapari, String> listVyaapariName;
+	@FXML
+	private TableColumn<Vyaapari, String> listVyaapariPhone;
+	@FXML
+	private TableColumn<Vyaapari, String> listVyaapariAddress;
+
+	private List<Vyaapari> vyaapariArrayList;
+	private List<ColdStorage> coldStorageList;
+
+	@FXML
 	Tab addVyaapari;
 
 	@FXML
@@ -52,6 +79,52 @@ public class ColdVyaapariController {
 	private Text successMessage1;
 
 	private Session s;
+
+	@FXML
+	protected void initialize() {
+		try {
+			s = SessionCreation.getSessionInstance();
+		} catch (Exception e) {
+			successMessage.setText("Database errors occoured");
+		}
+		cold_date.setPromptText("dd/MM/yyyy");
+		cold_date.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+		vyaapariDate.setPromptText("dd/MM/yyyy");
+		vyaapariDate.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+		initializeColdTable();
+		initializeVyaapariTable();
+	}
+
+	private void initializeColdTable() {
+		makeColdStorageList();
+		coldListView.setEditable(true);
+		listColdName.setCellValueFactory(new PropertyValueFactory<ColdStorage, String>("coldName"));
+		listColdPhone.setCellValueFactory(new PropertyValueFactory<ColdStorage, String>("phoneNo"));
+		listColdAddress.setCellValueFactory(new PropertyValueFactory<ColdStorage, String>("address"));
+		coldListView.setItems(FXCollections.observableList(coldStorageList));
+	}
+
+	private void initializeVyaapariTable() {
+		getVyaapariList();
+		vyaapariListView.setEditable(true);
+		listVyaapariName.setCellValueFactory(new PropertyValueFactory<Vyaapari, String>("vyaapariName"));
+		listVyaapariPhone.setCellValueFactory(new PropertyValueFactory<Vyaapari, String>("phoneNo"));
+		listVyaapariAddress.setCellValueFactory(new PropertyValueFactory<Vyaapari, String>("address"));
+		vyaapariListView.setItems(FXCollections.observableList(vyaapariArrayList));
+	}
+
+	@SuppressWarnings("unchecked")
+	private void getVyaapariList() {
+		vyaapariArrayList = new ArrayList<>();
+		vyaapariArrayList = s.createQuery("FROM Vyaapari").list();
+	}
+
+	@SuppressWarnings("unchecked")
+	private void makeColdStorageList() {
+		coldStorageList = new ArrayList<>();
+		String hql = "FROM ColdStorage";
+		coldStorageList = s.createQuery(hql).list();
+	}
 
 	@FXML
 	public void addColdStorage() {
@@ -84,33 +157,6 @@ public class ColdVyaapariController {
 	}
 
 	@FXML
-	protected void initialize() {
-		try {
-			s = SessionCreation.getSessionInstance();
-		} catch (Exception e) {
-			successMessage.setText("Database errors occoured");
-		}
-		cold_date.setPromptText("dd/MM/yyyy");
-		cold_date.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-		vyaapariDate.setPromptText("dd/MM/yyyy");
-		vyaapariDate.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-
-	}
-
-	/*
-	 * private void initializePartyTable() { partyList =
-	 * s.createQuery("FROM Party").list(); tablePartyId.setCellValueFactory(new
-	 * PropertyValueFactory<Party, String>("partyId"));
-	 * tablePartyName.setCellValueFactory(new PropertyValueFactory<Party,
-	 * String>("partyName")); tablePartyGstn.setCellValueFactory(new
-	 * PropertyValueFactory<Party, String>("gstNo"));
-	 * tablePartyAddress.setCellValueFactory(new PropertyValueFactory<Party,
-	 * String>("address")); tablePartyPhone.setCellValueFactory(new
-	 * PropertyValueFactory<Party, String>("phoneNo"));
-	 * partyTable.getItems().setAll(partyList); }
-	 */
-
-	@FXML
 	protected void addVyaapari() {
 		try {
 			Transaction tx = s.beginTransaction();
@@ -121,17 +167,6 @@ public class ColdVyaapariController {
 		} catch (Exception e) {
 			successMessage1.setText("Make sure you have entererd all fields correctly !");
 		}
-		//
-		// String partySearch = searchPartyName.getText();
-		// List<Party> searchList = partyList.stream()
-		// .filter((party) ->
-		// party.getPartyName().toLowerCase().contains(partySearch.toLowerCase()))
-		// .collect(Collectors.toList());
-		// if (!"".equalsIgnoreCase(partySearch) || partySearch != null)
-		// partyTable.getItems().setAll(searchList);
-		// else
-		// partyTable.getItems().setAll(partyList);
-
 	}
 
 	private Vyaapari makeVyaapari(Vyaapari vyaapari) {

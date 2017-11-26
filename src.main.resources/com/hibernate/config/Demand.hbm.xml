@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.mg.csms.beans.Demand" table="DEMAND">
+		<id name="demandId" type="integer" column="DEMAND_ID">
+			<generator class="increment" />
+		</id>
+		<property name="coldNo" column="COLD_NO" />
+		<property name="demandDate" column="DEMAND_DATE" />
+		<property name="quantity" column="QUANTITY" />
+	</class>
+</hibernate-mapping>

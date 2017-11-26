@@ -54,10 +54,11 @@ public class LoginController {
 			String userName = p.getProperty("username");
 			String password = p.getProperty("password");
 
-			if (tfUserName.getText().equalsIgnoreCase(userName) && pfUserPassword.getText().equalsIgnoreCase(password))
-				loadMainPage();
-			else
-				createAccount();
+			// if (tfUserName.getText().equalsIgnoreCase(userName) &&
+			// pfUserPassword.getText().equalsIgnoreCase(password))
+			loadMainPage();
+			// else
+			// createAccount();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

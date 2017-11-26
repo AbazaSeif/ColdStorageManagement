@@ -56,14 +56,60 @@
                   </rotationAxis>
                 </Text>
                 <TextField id="cust_date" fx:id="vyaapariDate" layoutX="107.0" layoutY="20.0" prefWidth="144.9978125" promptText="dd-mm-yyyy" />
-                <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="14.0" layoutY="58.0" rotationAxis="$x3" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Vyaapari Name" textAlignment="CENTER" underline="false" />
+                <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="14.0" layoutY="58.0" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Vyaapari Name" textAlignment="CENTER" underline="false">
+                  <rotationAxis>
+                    <Point3D x="1.0" y="1.0" z="1.0" fx:id="x3" />
+                  </rotationAxis>
+                </Text>
                 <TextField fx:id="vyaapariName" layoutX="107.0" layoutY="42.0" prefWidth="144.9978125" />
-                <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="14.0" layoutY="80.0" rotationAxis="$x3" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Vyaapari Address" textAlignment="CENTER" underline="false" />
-                <TextField  fx:id="vyaapariAddress" layoutX="107.0" layoutY="64.0" prefWidth="145.0" promptText="Complete Address" />
-                <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="16.0" layoutY="101.0" rotationAxis="$x3" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Phone No" textAlignment="CENTER" underline="false" />
-                <TextField  fx:id="vyaapariNumber" layoutX="107.0" layoutY="87.0" prefWidth="144.9978125" promptText="9999999999" />
+                <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="14.0" layoutY="80.0" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Vyaapari Address" textAlignment="CENTER" underline="false">
+                  <rotationAxis>
+                    <Point3D x="1.0" y="1.0" z="1.0" fx:id="x3" />
+                  </rotationAxis>
+                </Text>
+                <TextField fx:id="vyaapariAddress" layoutX="107.0" layoutY="64.0" prefWidth="145.0" promptText="Complete Address" />
+                <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="16.0" layoutY="101.0" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Phone No" textAlignment="CENTER" underline="false">
+                  <rotationAxis>
+                    <Point3D x="1.0" y="1.0" z="1.0" fx:id="x3" />
+                  </rotationAxis>
+                </Text>
+                <TextField fx:id="vyaapariNumber" layoutX="107.0" layoutY="87.0" prefWidth="144.9978125" promptText="9999999999" />
                 <Button layoutX="76.0" layoutY="150.0" mnemonicParsing="false" onAction="#addVyaapari" text="Add Vyaapari" />
                 <Text fx:id="successMessage1" fill="$x4" layoutX="56.0" layoutY="204.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" />
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+        <Tab text="LIST COLD">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <children>
+                <TableView fx:id="coldListView" layoutX="14.0" layoutY="47.0" prefHeight="200.0" prefWidth="429.0">
+                  <columns>
+                    <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="139.0" text="Name" fx:id="listColdName" />
+                    <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="143.0" text="Phone Number" fx:id="listColdPhone" />
+                    <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="145.0" text="Address" fx:id="listColdAddress" />
+                  </columns>
+                </TableView>
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+        <Tab text="LIST VYAAPARI">
+          <content>
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <children>
+                <AnchorPane id="Content" layoutX="0.0" layoutY="0.0" minHeight="0.0" minWidth="0.0" prefHeight="276.0" prefWidth="457.0">
+                  <children>
+                    <TableView fx:id="vyaapariListView" layoutX="14.0" layoutY="47.0" prefHeight="200.0" prefWidth="429.0">
+                      <columns>
+                        <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="139.0" text="Name" fx:id="listVyaapariName" />
+                        <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="143.0" text="Phone Number" fx:id="listVyaapariPhone" />
+                        <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="145.0" text="Address" fx:id="listVyaapariAddress" />
+                      </columns>
+                    </TableView>
+                  </children>
+                </AnchorPane>
               </children>
             </AnchorPane>
           </content>
