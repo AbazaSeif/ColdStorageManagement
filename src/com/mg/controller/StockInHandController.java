@@ -207,13 +207,14 @@ public class StockInHandController {
 	}
 
 	private void makeItemStockListForVyaapari(InwardStock vyaapariStock) {
-		stockItemList1 = stockItemList.stream().filter(element -> element.getInwardStock().getStockId() == vyaapariStock.getStockId())
+		stockItemList1 = stockItemList.stream()
+				.filter(element -> element.getInwardStock().getStockId() == vyaapariStock.getStockId())
 				.collect(Collectors.toList());
 		stockItemList1.forEach(stockItem -> stockListUpdated.add(stockItem));
 		if (gadiNoFromChoiceBox != 0)
 			stockListUpdated = stockListUpdated.stream()
-			.filter(element -> Integer.parseInt(element.getInwardStock().getGadiNo()) == gadiNoFromChoiceBox)
-			.collect(Collectors.toList());
+					.filter(element -> Integer.parseInt(element.getInwardStock().getGadiNo()) == gadiNoFromChoiceBox)
+					.collect(Collectors.toList());
 
 		stockListView.setItems(FXCollections.observableList(stockListUpdated));
 	}
@@ -221,8 +222,8 @@ public class StockInHandController {
 	private ObservableList<String> getVyaapariList() {
 		dbQueriesUtils.makeVyaapariList();
 		List<String> vyaapariNameList = new ArrayList<>();
-		dbQueriesUtils.getVyaapariArrayList().forEach(
-				vyaapariObject -> vyaapariNameList.add(vyaapariObject.getVyaapariId() + ": " + vyaapariObject.getVyaapariName()));
+		dbQueriesUtils.getVyaapariArrayList().forEach(vyaapariObject -> vyaapariNameList
+				.add(vyaapariObject.getVyaapariId() + ": " + vyaapariObject.getVyaapariName()));
 		return FXCollections.observableList(vyaapariNameList);
 	}
 }

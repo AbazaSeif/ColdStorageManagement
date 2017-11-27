@@ -1,8 +1,6 @@
 package com.mg.controller;
 
 import java.sql.Date;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import org.hibernate.Transaction;
 
@@ -27,7 +25,7 @@ import javafx.scene.text.Text;
 public class ColdVyaapariController {
 
 	private DBQueriesUtils dbQueriesUtils;
-	
+
 	@FXML
 	private TextField coldDate;
 	@FXML
