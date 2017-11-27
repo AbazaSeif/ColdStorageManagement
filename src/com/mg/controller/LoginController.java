@@ -1,6 +1,5 @@
 package com.mg.controller;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
@@ -19,6 +18,13 @@ import javafx.scene.layout.Pane;
  *
  */
 public class LoginController {
+
+	private static final String PASSWORD = "password";
+	private static final String USERNAME = "username";
+	private static final String RESOURCES_LOGIN_PROPERTIES = "./resources/login.properties";
+	private static final String VIEW_REGISTRATION_FXML = "/view/Registration.fxml";
+	private static final String VIEW_MAIN_MENU_FXML = "/view/MainMenu.fxml";
+	
 	@FXML
 	private AnchorPane apDesignPane;
 	@FXML
@@ -27,50 +33,30 @@ public class LoginController {
 	private TextField tfUserName;
 	@FXML
 	private PasswordField pfUserPassword;
-
 	@FXML
 	private Button btnLogin;
 
 	@FXML
-	public void createAccount() {
-		try {
-			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/Registration.fxml"));
-			Pane cmdPane = (Pane) fxmlLoader.load();
-			apDesignPane.getChildren().clear();
-			apDesignPane.getChildren().add(cmdPane);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@FXML
 	public void btnLogin() {
-		FileReader reader;
-		try {
-			reader = new FileReader("./resources/login.properties");
+		try (FileReader reader = new FileReader(RESOURCES_LOGIN_PROPERTIES)){
 			Properties p = new Properties();
 			p.load(reader);
 
-			String userName = p.getProperty("username");
-			String password = p.getProperty("password");
-
-			// if (tfUserName.getText().equalsIgnoreCase(userName) &&
-			// pfUserPassword.getText().equalsIgnoreCase(password))
-			loadMainPage();
-			// else
-			// createAccount();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			if (tfUserName.getText().equalsIgnoreCase(p.getProperty(USERNAME)) &&
+					pfUserPassword.getText().equalsIgnoreCase(p.getProperty(PASSWORD)))
+				makePane(VIEW_MAIN_MENU_FXML);
+			else
+				makePane(VIEW_REGISTRATION_FXML);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
-	private void loadMainPage() {
+	private void makePane(String fxmlPath) {
 		try {
-			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MainMenu.fxml"));
-			Pane cmdPane = (Pane) fxmlLoader.load();
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(fxmlPath));
+			Pane cmdPane = fxmlLoader.load();
 			apDesignPane.getChildren().clear();
 			apDesignPane.getChildren().add(cmdPane);
 		} catch (IOException e) {

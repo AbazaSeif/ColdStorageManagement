@@ -29,13 +29,13 @@
                     <Point3D x="1.0" y="1.0" z="1.0" fx:id="x3" />
                   </rotationAxis>
                 </Text>
-                <TextField fx:id="cold_date" layoutX="104.0" layoutY="20.0" prefWidth="144.9978125" promptText="dd-mm-yyyy" />
+                <TextField fx:id="coldDate" layoutX="104.0" layoutY="20.0" prefWidth="144.9978125" promptText="dd-mm-yyyy" />
                 <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="14.0" layoutY="58.0" rotationAxis="$x3" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Cold Name" textAlignment="CENTER" underline="false" />
-                <TextField fx:id="cold_name" layoutX="104.0" layoutY="42.0" prefWidth="144.9978125" />
+                <TextField fx:id="coldName" layoutX="104.0" layoutY="42.0" prefWidth="144.9978125" />
                 <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="14.0" layoutY="80.0" rotationAxis="$x3" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Cold Address" textAlignment="CENTER" underline="false" />
-                <TextField fx:id="cold_add" layoutX="104.0" layoutY="64.0" prefWidth="145.0" promptText="Complete Address" />
+                <TextField fx:id="coldAdd" layoutX="104.0" layoutY="64.0" prefWidth="145.0" promptText="Complete Address" />
                 <Text fill="$x1" font="$x2" fontSmoothingType="LCD" layoutX="16.0" layoutY="101.0" rotationAxis="$x3" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="Phone No" textAlignment="CENTER" underline="false" />
-                <TextField fx:id="cold_phone" layoutX="104.0" layoutY="87.0" prefWidth="144.9978125" promptText="9999999999" />
+                <TextField fx:id="coldPhone" layoutX="104.0" layoutY="87.0" prefWidth="144.9978125" promptText="9999999999" />
                 <Button layoutX="76.0" layoutY="150.0" mnemonicParsing="false" onAction="#addColdStorage" text="Add Cold Storage" />
                 <Text fx:id="successMessage" layoutX="56.0" layoutY="204.0" strokeType="OUTSIDE" strokeWidth="0.0" text="">
                   <fill>

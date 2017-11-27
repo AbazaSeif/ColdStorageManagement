@@ -1,27 +1,21 @@
 package com.mg.controller;
 
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.mg.csms.beans.ColdStorage;
 import com.mg.csms.beans.InwardStock;
 import com.mg.csms.beans.InwardStockItem;
-import com.mg.csms.beans.Vyaapari;
-import com.mg.csms.database.SessionCreation;
+import com.mg.utils.DBQueriesUtils;
+import com.mg.utils.DateUtils;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -32,6 +26,8 @@ import javafx.scene.text.Text;
  *
  */
 public class InwardStockController {
+	
+	List<InwardStockItem> addItemList;
 
 	@FXML
 	private ComboBox<String> coldStoreList;
@@ -67,22 +63,16 @@ public class InwardStockController {
 	@FXML
 	private TableColumn<InwardStockItem, String> tableRate;
 
-	private List<ColdStorage> coldStoreArrayList;
-	private List<Vyaapari> vyaapariArrayList;
-	private Session session;
-
 	@FXML
 	private Text successMessage;
-
-	List<InwardStockItem> addItemList;
-
+	private DBQueriesUtils dbQueriesUtils;
+	
 	@FXML
 	protected void initialize() {
 		try {
-			session = SessionCreation.getSessionInstance();
+			dbQueriesUtils = DBQueriesUtils.getInstance();
 		} catch (Exception e) {
 			successMessage.setText("Database errors occoured");
-			e.printStackTrace();
 		}
 		initializeItems();
 		initializeTable();
@@ -90,11 +80,10 @@ public class InwardStockController {
 
 	private void initializeItems() {
 		addItemList = new ArrayList<>();
-		stockInwardDate.setPromptText("dd/MM/yyyy");
-		stockInwardDate.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+		DateUtils.initializeDate(stockInwardDate);
 		coldStoreList.setItems(getColdStoreList());
 		vyaapariList.setItems(getVyaapariList());
-		itemList.setItems(getItemsList());
+		itemList.setItems(makeItemsList());
 	}
 
 	private void initializeTable() {
@@ -104,8 +93,6 @@ public class InwardStockController {
 		tableItem.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("item"));
 		tableQuantity.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("quantity"));
 		tableRate.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("rate"));
-
-		setTableEditableActions();
 	}
 
 	@FXML
@@ -139,14 +126,13 @@ public class InwardStockController {
 	@FXML
 	protected void submitStock() {
 		try {
-			Transaction tx = session.beginTransaction();
+			Transaction tx = dbQueriesUtils.getSession().beginTransaction();
 			InwardStock stock = makeInwardStock(new InwardStock());
-			session.save(stock);
+			dbQueriesUtils.getSession().save(stock);
 			makeInwardStockItemsAndSave(stock);
 			tx.commit();
 			successMessage.setText("Lot added successfully.");
 		} catch (Exception e) {
-			e.printStackTrace();
 			successMessage.setText("Make sure you have entererd all fields correctly !");
 		}
 		clearOverallUI();
@@ -163,26 +149,19 @@ public class InwardStockController {
 			item.setInwardStock(stock);
 			item.setEntryDate(stock.getDate());
 			item.setGadiNo(stock.getGadiNo());
-			session.save(item);
+			dbQueriesUtils.getSession().save(item);
 		});
 	}
 
 	private InwardStock makeInwardStock(InwardStock inwardStock) {
 		inwardStock.setColdId(
-				Integer.parseInt(coldStoreList.getValue().substring(0, coldStoreList.getValue().indexOf(":"))));
-		inwardStock.setDate(makeDate());
+				Integer.parseInt(coldStoreList.getValue().substring(0, coldStoreList.getValue().indexOf(':'))));
+		inwardStock.setDate(DateUtils.makeDate(stockInwardDate));
 		inwardStock.setGadiNo(gadiNo.getText());
 		inwardStock.setVyaapariId(
-				Integer.parseInt(vyaapariList.getValue().substring(0, vyaapariList.getValue().indexOf(":"))));
+				Integer.parseInt(vyaapariList.getValue().substring(0, vyaapariList.getValue().indexOf(':'))));
 		inwardStock.setQty(Integer.parseInt(totalQuantity.getText()));
 		return inwardStock;
-	}
-
-	private Date makeDate() {
-		LocalDate date = LocalDate.of(Integer.parseInt(stockInwardDate.getText().substring(6, 10)),
-				Integer.parseInt(stockInwardDate.getText().substring(3, 5)),
-				Integer.parseInt(stockInwardDate.getText().substring(0, 2)));
-		return Date.valueOf(date);
 	}
 
 	private void clearOverallUI() {
@@ -196,26 +175,22 @@ public class InwardStockController {
 		clearUI();
 	}
 
-	@SuppressWarnings("unchecked")
 	private ObservableList<String> getColdStoreList() {
-		coldStoreArrayList = new ArrayList<>();
-		coldStoreArrayList = session.createQuery("FROM ColdStorage").list();
+		dbQueriesUtils.makeColdStorageList();
 		List<String> coldStoreNameList = new ArrayList<>();
-		coldStoreArrayList.forEach((cold) -> coldStoreNameList.add(cold.getColdId() + ": " + cold.getColdName()));
+		dbQueriesUtils.getColdStorageList().forEach(cold -> coldStoreNameList.add(cold.getColdId() + ": " + cold.getColdName()));
 		return FXCollections.observableList(coldStoreNameList);
 	}
 
-	@SuppressWarnings("unchecked")
 	private ObservableList<String> getVyaapariList() {
-		vyaapariArrayList = new ArrayList<>();
-		vyaapariArrayList = session.createQuery("FROM Vyaapari").list();
+		dbQueriesUtils.makeVyaapariList();
 		List<String> vyaapariNameList = new ArrayList<>();
-		vyaapariArrayList.forEach(
-				(vyaapari) -> vyaapariNameList.add(vyaapari.getVyaapariId() + ": " + vyaapari.getVyaapariName()));
+		dbQueriesUtils.getVyaapariArrayList().forEach(
+				vyaapari -> vyaapariNameList.add(vyaapari.getVyaapariId() + ": " + vyaapari.getVyaapariName()));
 		return FXCollections.observableList(vyaapariNameList);
 	}
 
-	private ObservableList<String> getItemsList() {
+	private ObservableList<String> makeItemsList() {
 		List<String> itemsList = new ArrayList<>();
 		itemsList.add("Dhaniya");
 		itemsList.add("Ajwain");
@@ -223,49 +198,10 @@ public class InwardStockController {
 		itemsList.add("Methi");
 		itemsList.add("Kaloonji");
 		itemsList.add("Sarsoon");
+		itemsList.add("Rai");
 		itemsList.add("Dhaniya Dal");
+		Collections.sort(itemsList);
 		return FXCollections.observableList(itemsList);
-	}
-
-	private void setTableEditableActions() {
-		tableLotNo.setOnEditCommit(new EventHandler<CellEditEvent<InwardStockItem, String>>() {
-			@Override
-			public void handle(CellEditEvent<InwardStockItem, String> t) {
-				t.getTableView().getItems().get(t.getTablePosition().getRow())
-						.setLotNo(Integer.parseInt(t.getNewValue()));
-			}
-		});
-
-		tableColdNo.setOnEditCommit(new EventHandler<CellEditEvent<InwardStockItem, String>>() {
-			@Override
-			public void handle(CellEditEvent<InwardStockItem, String> t) {
-				t.getTableView().getItems().get(t.getTablePosition().getRow())
-						.setColdNo(Integer.parseInt(t.getNewValue()));
-			}
-		});
-
-		tableItem.setOnEditCommit(new EventHandler<CellEditEvent<InwardStockItem, String>>() {
-			@Override
-			public void handle(CellEditEvent<InwardStockItem, String> t) {
-				t.getTableView().getItems().get(t.getTablePosition().getRow()).setItem(t.getNewValue());
-			}
-		});
-
-		tableQuantity.setOnEditCommit(new EventHandler<CellEditEvent<InwardStockItem, String>>() {
-			@Override
-			public void handle(CellEditEvent<InwardStockItem, String> t) {
-				t.getTableView().getItems().get(t.getTablePosition().getRow())
-						.setQuantity(Integer.parseInt(t.getNewValue()));
-			}
-		});
-
-		tableRate.setOnEditCommit(new EventHandler<CellEditEvent<InwardStockItem, String>>() {
-			@Override
-			public void handle(CellEditEvent<InwardStockItem, String> t) {
-				t.getTableView().getItems().get(t.getTablePosition().getRow())
-						.setRate(Float.parseFloat(t.getNewValue()));
-			}
-		});
 	}
 
 	@FXML
