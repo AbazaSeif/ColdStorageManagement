@@ -20,6 +20,7 @@ public class InwardStockItem implements Serializable {
 	private InwardStock inwardStock;
 	private Date entryDate;
 	private String gadiNo;
+	private Integer balance;
 
 	public InwardStockItem() {
 	}
@@ -102,6 +103,14 @@ public class InwardStockItem implements Serializable {
 
 	public void setGadiNo(String gadiNo) {
 		this.gadiNo = gadiNo;
+	}
+
+	public Integer getBalance() {
+		return balance;
+	}
+
+	public void setBalance(Integer balance) {
+		this.balance = balance;
 	}
 
 }

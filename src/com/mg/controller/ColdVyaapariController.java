@@ -11,6 +11,7 @@ import com.mg.utils.DateUtils;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -27,7 +28,7 @@ public class ColdVyaapariController {
 	private DBQueriesUtils dbQueriesUtils;
 
 	@FXML
-	private TextField coldDate;
+	private DatePicker coldDate;
 	@FXML
 	private TextField coldName;
 	@FXML
@@ -35,7 +36,7 @@ public class ColdVyaapariController {
 	@FXML
 	private TextField coldPhone;
 	@FXML
-	private TextField vyaapariDate;
+	private DatePicker vyaapariDate;
 	@FXML
 	private TextField vyaapariName;
 	@FXML
@@ -73,7 +74,7 @@ public class ColdVyaapariController {
 	@FXML
 	protected void initialize() {
 		try {
-			dbQueriesUtils = DBQueriesUtils.getInstance();
+			dbQueriesUtils = new DBQueriesUtils();
 		} catch (Exception e) {
 			successMessage.setText("Database errors occoured");
 		}

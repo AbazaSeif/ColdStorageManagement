@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.hibernate.Query;
+import org.apache.log4j.Logger;
 
 import com.mg.csms.beans.ColdStorage;
 import com.mg.csms.beans.Demand;
@@ -15,7 +15,6 @@ import com.mg.csms.beans.InwardStockItem;
 import com.mg.utils.DBQueriesUtils;
 
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -25,7 +24,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
 
 /**
  * @author Mohak Gupta
@@ -33,12 +31,11 @@ import javafx.util.Callback;
  */
 public class StockInHandController {
 
+	private static Logger log = Logger.getLogger(StockInHandController.class);
+
 	private List<InwardStock> vyaapariStockList;
-	private List<InwardStock> vyaapariStockListFromDB;
-	private List<InwardStockItem> stockItemList;
 	private List<InwardStockItem> stockItemList1;
 	private List<InwardStockItem> stockListUpdated;
-	private List<Demand> demandList;
 	private List<Demand> demandListToShow;
 
 	private Integer vyaapariIdFromChoiceBox;
@@ -67,6 +64,9 @@ public class StockInHandController {
 	@FXML
 	private TableColumn<InwardStockItem, String> itemColdStore;
 	@FXML
+	private TableColumn<InwardStockItem, String> itemBalance;
+
+	@FXML
 	private TableView<Demand> demandListTable;
 	@FXML
 	private TableColumn<Demand, Date> demandTableDate;
@@ -78,70 +78,53 @@ public class StockInHandController {
 	@FXML
 	protected void initialize() {
 		try {
-			dbQueriesUtils = DBQueriesUtils.getInstance();
+			dbQueriesUtils = new DBQueriesUtils();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.debug(e);
 		}
 		vyaapari.setItems(getVyaapariList());
-
-		makeColdStorageList();
-		makeVyaapariStockList();
-		makeCompleteStockList();
+		demandListToShow = new ArrayList<>();
 		makeVyaapariChangeAction();
 		makeGadiNoChangeAction();
 		initializeTableViews();
 		addTableRowAction();
-		makeDemandTableList();
-	}
-
-	@SuppressWarnings("unchecked")
-	private void makeDemandTableList() {
-		demandList = new ArrayList<>();
-		demandListToShow = new ArrayList<>();
-		String hql = "FROM Demand";
-		Query query = dbQueriesUtils.getSession().createQuery(hql);
-		demandList = query.list();
 	}
 
 	private void addTableRowAction() {
-		stockListView.getSelectionModel().selectedIndexProperty().addListener((num) -> {
-			populateDemandTable(stockListView.getSelectionModel().selectedItemProperty().get().getColdNo());
-		});
+		stockListView.getSelectionModel().selectedIndexProperty().addListener(num ->
+		populateDemandTable(stockListView.getSelectionModel().selectedItemProperty().get().getColdNo()));
 	}
 
 	private void populateDemandTable(Integer coldNo) {
-		demandListToShow = demandList.stream().filter(demand -> demand.getColdNo().equals(coldNo))
+		demandListToShow = dbQueriesUtils.getDemandList().stream().filter(demand -> demand.getColdNo().equals(coldNo))
 				.collect(Collectors.toList());
 		demandListTable.setItems(FXCollections.observableList(demandListToShow));
 	}
 
 	private void makeGadiNoChangeAction() {
-		gadiNo.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
-				gadiNoFromChoiceBox = 0;
-				if (number2.intValue() >= 0)
-					gadiNoFromChoiceBox = Integer.parseInt(gadiNo.getItems().get((Integer) number2));
-				populateListView();
-			}
-
+		gadiNo.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> observableValue, Number number, Number number2) ->{
+			gadiNoFromChoiceBox = 0;
+			if (number2.intValue() >= 0)
+				gadiNoFromChoiceBox = Integer.parseInt(gadiNo.getItems().get((Integer) number2));
+			populateListView();
 		});
 	}
 
 	private void makeVyaapariChangeAction() {
-		vyaapari.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
-				vyaapariIdFromChoiceBox = Integer.parseInt(vyaapari.getItems().get((Integer) number2).substring(0,
-						vyaapari.getItems().get((Integer) number2).indexOf(":")));
-				populateListView();
-				gadiNo.setItems(getGadiNoBasedOnVyaapari(vyaapariIdFromChoiceBox));
-			}
-
+		vyaapari.getSelectionModel().selectedIndexProperty().addListener((ObservableValue<? extends Number> observableValue, Number number, Number number2) ->{
+			vyaapariIdFromChoiceBox = Integer.parseInt(vyaapari.getItems().get((Integer) number2).substring(0,
+					vyaapari.getItems().get((Integer) number2).indexOf(':')));
+			populateListView();
+			gadiNo.setItems(getGadiNoBasedOnVyaapari());
 		});
 	}
 
 	private void initializeTableViews() {
+		initializeStockListTableView();
+		initializeDemandListTableView();
+	}
+
+	private void initializeStockListTableView() {
 		stockListView.setEditable(true);
 		entryDate.setCellValueFactory(new PropertyValueFactory<InwardStockItem, Date>("entryDate"));
 		itemColdNo.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("coldNo"));
@@ -150,24 +133,23 @@ public class StockInHandController {
 		itemGadiNo.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("gadiNo"));
 		itemExpectedRate.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("rate"));
 		itemLotNo.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("lotNo"));
+		itemBalance.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("balance"));
 
-		itemColdStore.setCellValueFactory(
-				new Callback<CellDataFeatures<InwardStockItem, String>, ObservableValue<String>>() {
-					@Override
-					public ObservableValue<String> call(CellDataFeatures<InwardStockItem, String> data) {
-						Optional<ColdStorage> coldObject = dbQueriesUtils.getColdStorageList().stream()
-								.filter(cold -> cold.getColdId() == data.getValue().getInwardStock().getColdId())
-								.findFirst();
-						return new SimpleStringProperty(coldObject.get().getColdName());
-					}
-				});
+		itemColdStore.setCellValueFactory((CellDataFeatures<InwardStockItem, String> data) -> {
+			Optional<ColdStorage> coldObject = dbQueriesUtils.getColdStorageList().stream()
+					.filter(cold -> cold.getColdId() == data.getValue().getInwardStock().getColdId())
+					.findFirst();
+			return new SimpleStringProperty(coldObject.get().getColdName());
+		});
+	}
 
+	private void initializeDemandListTableView() {
 		demandListTable.setEditable(true);
 		demandTableDate.setCellValueFactory(new PropertyValueFactory<Demand, Date>("demandDate"));
 		demandTableQuantity.setCellValueFactory(new PropertyValueFactory<Demand, String>("quantity"));
 	}
 
-	private ObservableList<String> getGadiNoBasedOnVyaapari(Integer vyaapariId) {
+	private ObservableList<String> getGadiNoBasedOnVyaapari() {
 		List<String> gadiNoList = new ArrayList<>();
 		getVyaapariStockList();
 		vyaapariStockList.forEach(listItem -> gadiNoList.add(listItem.getGadiNo()));
@@ -183,38 +165,19 @@ public class StockInHandController {
 	}
 
 	private void getVyaapariStockList() {
-		vyaapariStockList = vyaapariStockListFromDB.stream()
+		vyaapariStockList = dbQueriesUtils.getStockListFromDB().stream()
 				.filter(element -> element.getVyaapariId() == vyaapariIdFromChoiceBox).collect(Collectors.toList());
 	}
 
-	@SuppressWarnings("unchecked")
-	private void makeVyaapariStockList() {
-		vyaapariStockListFromDB = new ArrayList<>();
-		String hql = "FROM InwardStock";
-		vyaapariStockListFromDB = dbQueriesUtils.getSession().createQuery(hql).list();
-
-	}
-
-	private void makeColdStorageList() {
-		dbQueriesUtils.makeColdStorageList();
-	}
-
-	@SuppressWarnings("unchecked")
-	private void makeCompleteStockList() {
-		String hql = "FROM InwardStockItem";
-		Query query = dbQueriesUtils.getSession().createQuery(hql);
-		stockItemList = query.list();
-	}
-
 	private void makeItemStockListForVyaapari(InwardStock vyaapariStock) {
-		stockItemList1 = stockItemList.stream()
+		stockItemList1 = dbQueriesUtils.getStockItemList().stream()
 				.filter(element -> element.getInwardStock().getStockId() == vyaapariStock.getStockId())
 				.collect(Collectors.toList());
 		stockItemList1.forEach(stockItem -> stockListUpdated.add(stockItem));
 		if (gadiNoFromChoiceBox != 0)
 			stockListUpdated = stockListUpdated.stream()
-					.filter(element -> Integer.parseInt(element.getInwardStock().getGadiNo()) == gadiNoFromChoiceBox)
-					.collect(Collectors.toList());
+			.filter(element -> Integer.parseInt(element.getInwardStock().getGadiNo()) == gadiNoFromChoiceBox)
+			.collect(Collectors.toList());
 
 		stockListView.setItems(FXCollections.observableList(stockListUpdated));
 	}

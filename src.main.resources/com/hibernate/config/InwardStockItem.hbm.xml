@@ -15,6 +15,7 @@
 		<property name="rate" column="RATE" />
 		<property name="entryDate" column="ENTRY_DATE" />
 		<property name="gadiNo" column="GADI_NO" />
+		<property name="balance" column="BALANCE" />
 		<many-to-one name="inwardStock" class="com.mg.csms.beans.InwardStock" fetch="select">
             <column name="STOCK_ID" not-null="true" />
         </many-to-one>

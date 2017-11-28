@@ -1,22 +1,21 @@
 package com.mg.controller;
 
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
+import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
 
 import com.mg.csms.beans.Demand;
 import com.mg.csms.beans.InwardStockItem;
-import com.mg.csms.database.SessionCreation;
+import com.mg.utils.DBQueriesUtils;
+import com.mg.utils.DateUtils;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -24,9 +23,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 
 public class DemandController {
+	private static Logger log = Logger.getLogger(DemandController.class);
 
 	@FXML
-	private TextField demandDate;
+	private DatePicker demandDate;
 	@FXML
 	private TextField coldNo;
 	@FXML
@@ -39,20 +39,19 @@ public class DemandController {
 	private TableColumn<Demand, String> tableQuantity;
 	@FXML
 	private Text successMessage;
-	private Session session;
 	List<Demand> addItemList;
+	private DBQueriesUtils dbQueriesUtils;
 
 	@FXML
 	private void initialize() {
 		try {
-			session = SessionCreation.getSessionInstance();
+			dbQueriesUtils = new DBQueriesUtils();
 		} catch (Exception e) {
 			successMessage.setText("Database errors occoured");
-			e.printStackTrace();
 		}
+
 		addItemList = new ArrayList<>();
-		demandDate.setPromptText("dd/MM/yyyy");
-		demandDate.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+		DateUtils.initializeDate(demandDate);
 		itemListTable.setEditable(true);
 		tableColdNo.setCellValueFactory(new PropertyValueFactory<Demand, String>("coldNo"));
 		tableQuantity.setCellValueFactory(new PropertyValueFactory<Demand, String>("quantity"));
@@ -85,11 +84,11 @@ public class DemandController {
 	private void submitDemand() {
 		try {
 			successMessage.setText("");
-			Transaction tx = session.beginTransaction();
+			Transaction tx = dbQueriesUtils.getSession().beginTransaction();
 			makeDemandItemsAndSave();
 			tx.commit();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.debug(e);
 			successMessage.setText("Make sure you have entererd all fields correctly !");
 		}
 		if ("".equalsIgnoreCase(successMessage.getText()))
@@ -97,35 +96,32 @@ public class DemandController {
 		clearOverallUI();
 	}
 
-	private void makeDemandItemsAndSave() throws Exception {
-		Date date = makeDate();
+	private void makeDemandItemsAndSave() {
 		itemListTable.getItems().stream().forEach(demandItem -> {
 			Demand demand = new Demand();
 			if (isValidColdNo(demandItem.getColdNo())) {
 				demand.setColdNo(demandItem.getColdNo());
-				demand.setDemandDate(date);
+				demand.setDemandDate(DateUtils.makeDate(demandDate));
 				demand.setQuantity(demandItem.getQuantity());
-				session.save(demand);
+				dbQueriesUtils.getSession().save(demand);
+				updateStockItemListBalance(demandItem);
 			} else
 				successMessage.setText("Cold Id " + demandItem.getColdNo()
-						+ " is not correct ! Verify that you made an entry in stock earlier.");
+				+ " is not correct ! Verify that you made an entry in stock earlier.");
 		});
 	}
 
-	@SuppressWarnings("unchecked")
-	private boolean isValidColdNo(Integer coldNo2) {
-		List<InwardStockItem> inwardStockItemList = new ArrayList<>();
-		String hql = "FROM InwardStockItem";
-		Query query = session.createQuery(hql);
-		inwardStockItemList = query.list();
-		return inwardStockItemList.stream().anyMatch(item -> item.getColdNo().equals(coldNo2));
+	private void updateStockItemListBalance(Demand demandItem) {
+		Optional<InwardStockItem> item = dbQueriesUtils.getStockItemList().stream().filter(ele -> ele.getColdNo() == demandItem.getColdNo()).findFirst();
+		if(item.isPresent()){
+			Integer balance = item.get().getBalance() - demandItem.getQuantity();
+			item.get().setBalance(balance);
+			dbQueriesUtils.getSession().update(item);
+		}
 	}
 
-	private Date makeDate() {
-		LocalDate date = LocalDate.of(Integer.parseInt(demandDate.getText().substring(6, 10)),
-				Integer.parseInt(demandDate.getText().substring(3, 5)),
-				Integer.parseInt(demandDate.getText().substring(0, 2)));
-		return Date.valueOf(date);
+	private boolean isValidColdNo(Integer coldNo2) {
+		return dbQueriesUtils.getStockItemList().stream().anyMatch(item -> item.getColdNo().equals(coldNo2));
 	}
 
 	private void clearOverallUI() {

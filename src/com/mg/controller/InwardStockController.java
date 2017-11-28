@@ -1,9 +1,13 @@
 package com.mg.controller;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
 
 import com.mg.csms.beans.InwardStock;
@@ -15,6 +19,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -26,7 +31,9 @@ import javafx.scene.text.Text;
  *
  */
 public class InwardStockController {
-	
+
+	private static Logger log = Logger.getLogger(InwardStockController.class);
+
 	List<InwardStockItem> addItemList;
 
 	@FXML
@@ -40,7 +47,7 @@ public class InwardStockController {
 	@FXML
 	private TextField gadiNo;
 	@FXML
-	private TextField stockInwardDate;
+	private DatePicker stockInwardDate;
 	@FXML
 	private TextField lotNo;
 	@FXML
@@ -66,11 +73,11 @@ public class InwardStockController {
 	@FXML
 	private Text successMessage;
 	private DBQueriesUtils dbQueriesUtils;
-	
+
 	@FXML
 	protected void initialize() {
 		try {
-			dbQueriesUtils = DBQueriesUtils.getInstance();
+			dbQueriesUtils = new DBQueriesUtils();
 		} catch (Exception e) {
 			successMessage.setText("Database errors occoured");
 		}
@@ -149,6 +156,7 @@ public class InwardStockController {
 			item.setInwardStock(stock);
 			item.setEntryDate(stock.getDate());
 			item.setGadiNo(stock.getGadiNo());
+			item.setBalance(itemStockItem.getQuantity());
 			dbQueriesUtils.getSession().save(item);
 		});
 	}
@@ -192,15 +200,14 @@ public class InwardStockController {
 
 	private ObservableList<String> makeItemsList() {
 		List<String> itemsList = new ArrayList<>();
-		itemsList.add("Dhaniya");
-		itemsList.add("Ajwain");
-		itemsList.add("Amchoor");
-		itemsList.add("Methi");
-		itemsList.add("Kaloonji");
-		itemsList.add("Sarsoon");
-		itemsList.add("Rai");
-		itemsList.add("Dhaniya Dal");
-		Collections.sort(itemsList);
+		try (FileReader reader = new FileReader("./resources/itemList.properties")) {
+			Properties p = new Properties();
+			p.load(reader);
+			p.entrySet().forEach(e -> itemsList.add((String) e.getValue()));
+			Collections.sort(itemsList);
+		} catch (IOException e) {
+			log.debug(e.getMessage());
+		}
 		return FXCollections.observableList(itemsList);
 	}
 

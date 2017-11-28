@@ -2,25 +2,21 @@ package com.mg.utils;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
-import javafx.scene.control.TextField;
+import javafx.scene.control.DatePicker;
 
 public class DateUtils {
-	
+
 	private static final String DATEFORMAT = "dd/MM/yyyy";
 
-	private DateUtils(){
-		
+	private DateUtils(){}
+
+	public static Date makeDate(DatePicker date) {
+		return Date.valueOf(date.getValue());
 	}
-	
-	public static Date makeDate(TextField date) {
-		LocalDate localDate = LocalDate.of(Integer.parseInt(date.getText().substring(6, 10)), Integer.parseInt(date.getText().substring(3, 5)), Integer.parseInt(date.getText().substring(0, 2)));
-		return Date.valueOf(localDate);
-	}
-	
-	public static void initializeDate(TextField date)	{
+
+	public static void initializeDate(DatePicker date)	{
 		date.setPromptText(DATEFORMAT);
-		date.setText(LocalDate.now().format(DateTimeFormatter.ofPattern(DATEFORMAT)));
+		date.setValue(LocalDate.now());
 	}
 }
