@@ -89,7 +89,7 @@ public class DemandController {
 			tx.commit();
 		} catch (Exception e) {
 			log.debug(e);
-			successMessage.setText("Make sure you have entererd all fields correctly !");
+			successMessage.setText("Some Error Occured !!! Make sure you have entererd all fields correctly !");
 		}
 		if ("".equalsIgnoreCase(successMessage.getText()))
 			successMessage.setText("Demand added successfully.");
@@ -103,25 +103,53 @@ public class DemandController {
 				demand.setColdNo(demandItem.getColdNo());
 				demand.setDemandDate(DateUtils.makeDate(demandDate));
 				demand.setQuantity(demandItem.getQuantity());
-				dbQueriesUtils.getSession().save(demand);
-				updateStockItemListBalance(demandItem);
+				if (updateStockItemListBalance(demandItem))
+					dbQueriesUtils.getSession().save(demand);
 			} else
 				successMessage.setText("Cold Id " + demandItem.getColdNo()
-				+ " is not correct ! Verify that you made an entry in stock earlier.");
+						+ " is not correct ! Verify that you made an entry in stock earlier.");
 		});
 	}
 
-	private void updateStockItemListBalance(Demand demandItem) {
-		Optional<InwardStockItem> item = dbQueriesUtils.getStockItemList().stream().filter(ele -> ele.getColdNo() == demandItem.getColdNo()).findFirst();
-		if(item.isPresent()){
+	private boolean updateStockItemListBalance(Demand demandItem) {
+		Optional<InwardStockItem> item = dbQueriesUtils.getStockItemList().stream()
+				.filter(ele -> ele.getColdNo().toString().equalsIgnoreCase(demandItem.getColdNo().toString()))
+				.findFirst();
+		if (item.isPresent()) {
+			if (item.get().getBalance() == 0) {
+				if ("".equalsIgnoreCase(successMessage.getText()))
+					successMessage.setText(" LOT " + item.get().getColdNo() + "Completed. Balance: 0");
+				else
+					successMessage.setText(successMessage.getText() + " AND " + " LOT " + item.get().getColdNo()
+							+ "Completed. Balance: 0");
+				return false;
+			}
 			Integer balance = item.get().getBalance() - demandItem.getQuantity();
+			if (balance < 0) {
+				if ("".equalsIgnoreCase(successMessage.getText()))
+					successMessage.setText("Insufficient quantity avaiable for COLD No: " + item.get().getColdNo()
+							+ ". Available: " + item.get().getBalance());
+				else
+					successMessage
+							.setText(successMessage.getText() + " AND " + "Insufficient quantity avaiable for COLD No: "
+									+ item.get().getColdNo() + ". Available: " + item.get().getBalance());
+				return false;
+			}
 			item.get().setBalance(balance);
-			dbQueriesUtils.getSession().update(item);
+			dbQueriesUtils.getSession().update(item.get());
+			return true;
+		} else {
+			if ("".equalsIgnoreCase(successMessage.getText()))
+				successMessage.setText("Cold No Does not exist. Please enter correct Cold No to place Demand.");
+			else
+				successMessage.setText(successMessage.getText() + " AND "
+						+ "Cold No Does not exist. Please enter correct Cold No to place Demand.");
 		}
+		return false;
 	}
 
-	private boolean isValidColdNo(Integer coldNo2) {
-		return dbQueriesUtils.getStockItemList().stream().anyMatch(item -> item.getColdNo().equals(coldNo2));
+	private boolean isValidColdNo(Integer coldNo) {
+		return dbQueriesUtils.getStockItemList().stream().anyMatch(item -> item.getColdNo().equals(coldNo));
 	}
 
 	private void clearOverallUI() {

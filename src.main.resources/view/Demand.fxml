@@ -24,7 +24,7 @@
     <TextField fx:id="quantity" layoutX="341.0" layoutY="56.0" prefWidth="87.0" />
     <Button layoutX="441.0" layoutY="55.0" mnemonicParsing="false" onAction="#addDemandToList" text="Add" />
     <Button layoutX="251.0" layoutY="312.0" mnemonicParsing="false" onAction="#submitDemand" text="SUBMIT" />
-    <Text fx:id="successMessage" fill="BLACK" layoutX="100.0" layoutY="347.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" />
+    <Text fx:id="successMessage" fill="BLACK" layoutX="100.0" layoutY="360.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" />
       <DatePicker fx:id="demandDate" layoutX="97.0" layoutY="56.0" prefHeight="25.0" prefWidth="136.0" />
   </children>
 </AnchorPane>

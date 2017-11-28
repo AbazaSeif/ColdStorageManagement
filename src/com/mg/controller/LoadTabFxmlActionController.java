@@ -29,17 +29,17 @@ public class LoadTabFxmlActionController {
 
 	@FXML
 	protected void initialize() {
-		stockEntryTab.setOnSelectionChanged(event-> loadTabBasedFXML("/view/StockEntry.fxml"));
-		stockinHandTab.setOnSelectionChanged(event-> loadTabBasedFXML("/view/StockInHand.fxml"));
-		demandTab.setOnSelectionChanged(event-> loadTabBasedFXML("/view/Demand.fxml"));
-		billingTab.setOnSelectionChanged(event-> loadTabBasedFXML("/view/Billing.fxml"));
-		coldVyaapariTab.setOnSelectionChanged(event-> loadTabBasedFXML("/view/ColdStorage.fxml"));
+		stockEntryTab.setOnSelectionChanged(event -> loadTabBasedFXML(stockEntryTab, "/view/StockEntry.fxml"));
+		stockinHandTab.setOnSelectionChanged(event -> loadTabBasedFXML(stockinHandTab, "/view/StockInHand.fxml"));
+		demandTab.setOnSelectionChanged(event -> loadTabBasedFXML(demandTab, "/view/Demand.fxml"));
+		billingTab.setOnSelectionChanged(event -> loadTabBasedFXML(billingTab, "/view/Billing.fxml"));
+		coldVyaapariTab.setOnSelectionChanged(event -> loadTabBasedFXML(coldVyaapariTab, "/view/ColdStorage.fxml"));
 	}
 
-	private void loadTabBasedFXML(String fxmlPath) {
+	private void loadTabBasedFXML(Tab tab, String fxmlPath) {
 		try {
 			AnchorPane anchorPane = FXMLLoader.load(this.getClass().getResource(fxmlPath));
-			stockEntryTab.setContent(anchorPane);
+			tab.setContent(anchorPane);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
