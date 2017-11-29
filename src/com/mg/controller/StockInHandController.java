@@ -39,7 +39,7 @@ public class StockInHandController {
 	private List<Demand> demandListToShow;
 
 	private Integer vyaapariIdFromChoiceBox;
-	private Integer gadiNoFromChoiceBox = 0;
+	protected Integer gadiNoFromChoiceBox = 0;
 
 	@FXML
 	private ChoiceBox<String> vyaapari;
@@ -91,12 +91,14 @@ public class StockInHandController {
 	}
 
 	private void addTableRowAction() {
-		stockListView.getSelectionModel().selectedIndexProperty().addListener(num ->
-		populateDemandTable(stockListView.getSelectionModel().selectedItemProperty().get().getColdNo()));
+		stockListView.getSelectionModel().selectedIndexProperty().addListener(num ->{
+			if(!stockListView.getSelectionModel().isEmpty())
+				populateDemandTable(stockListView.getSelectionModel().selectedItemProperty().get().getColdNo());
+		});
 	}
 
 	private void populateDemandTable(Integer coldNo) {
-		demandListToShow = dbQueriesUtils.getDemandList().stream().filter(demand -> demand.getColdNo().equals(coldNo))
+		demandListToShow = dbQueriesUtils.getDemandList().stream().filter(demand -> demand.getColdNo().toString().equalsIgnoreCase(coldNo.toString()))
 				.collect(Collectors.toList());
 		demandListTable.setItems(FXCollections.observableList(demandListToShow));
 	}
@@ -158,6 +160,7 @@ public class StockInHandController {
 
 	private void populateListView() {
 		stockListView.setItems(null);
+		demandListTable.setItems(null);
 		stockItemList1 = new ArrayList<>();
 		stockListUpdated = new ArrayList<>();
 		getVyaapariStockList();
@@ -173,13 +176,17 @@ public class StockInHandController {
 		stockItemList1 = dbQueriesUtils.getStockItemList().stream()
 				.filter(element -> element.getInwardStock().getStockId() == vyaapariStock.getStockId())
 				.collect(Collectors.toList());
-		stockItemList1.forEach(stockItem -> stockListUpdated.add(stockItem));
+		stockListUpdated = stockItemList1.stream().filter(element ->  filterStockItemCondition(element)).collect(Collectors.toList());
 		if (gadiNoFromChoiceBox != 0)
 			stockListUpdated = stockListUpdated.stream()
 			.filter(element -> Integer.parseInt(element.getInwardStock().getGadiNo()) == gadiNoFromChoiceBox)
 			.collect(Collectors.toList());
 
 		stockListView.setItems(FXCollections.observableList(stockListUpdated));
+	}
+
+	protected boolean filterStockItemCondition(InwardStockItem element) {
+		return  element.getBalance() > 0;
 	}
 
 	private ObservableList<String> getVyaapariList() {

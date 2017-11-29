@@ -86,7 +86,7 @@
             </AnchorPane>
           </content>
         </Tab>
-        <Tab closable="false" text="LIST COLD">
+        <Tab fx:id="coldStoreListTab" closable="false" text="LIST COLD">
           <content>
             <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
               <children>
@@ -101,7 +101,7 @@
             </AnchorPane>
           </content>
         </Tab>
-        <Tab closable="false" text="LIST VYAAPARI">
+        <Tab fx:id="vyaapariListTab" closable="false" text="LIST VYAAPARI">
           <content>
             <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
               <children>

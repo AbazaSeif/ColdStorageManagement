@@ -67,6 +67,11 @@ public class ColdVyaapariController {
 	@FXML
 	Tab addColdStorage;
 	@FXML
+	Tab coldStoreListTab;
+	@FXML
+	Tab vyaapariListTab;
+
+	@FXML
 	private Text successMessage;
 	@FXML
 	private Text successMessage1;
@@ -78,6 +83,7 @@ public class ColdVyaapariController {
 		} catch (Exception e) {
 			successMessage.setText("Database errors occoured");
 		}
+
 		initializeDate();
 		initializeColdTable();
 		initializeVyaapariTable();
@@ -114,9 +120,20 @@ public class ColdVyaapariController {
 			dbQueriesUtils.getSession().save(cold);
 			tx.commit();
 			successMessage.setText("Cold added successfully. Cold Id : " + cold.getColdId());
+			initializeColdTable();
+			clearUI();
 		} catch (Exception e) {
 			successMessage.setText("Make sure you have entererd all fields correctly !");
 		}
+	}
+
+	private void clearUI() {
+		coldName.setText("");
+		coldAdd.setText("");
+		coldPhone.setText("");
+		vyaapariName.setText("");
+		vyaapariAddress.setText("");
+		vyaapariNumber.setText("");
 	}
 
 	private ColdStorage makeColdStorage(ColdStorage cold) {
@@ -136,6 +153,8 @@ public class ColdVyaapariController {
 			dbQueriesUtils.getSession().save(vyaapari);
 			tx.commit();
 			successMessage1.setText("Vyaapari added successfully. Vyaapari ID : " + vyaapari.getVyaapariId());
+			initializeVyaapariTable();
+			clearUI();
 		} catch (Exception e) {
 			successMessage1.setText("Make sure you have entererd all fields correctly !");
 		}

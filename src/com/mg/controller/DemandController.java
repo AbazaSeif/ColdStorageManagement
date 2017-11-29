@@ -23,6 +23,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 
 public class DemandController {
+	private static final String MESSAGE_SEPERATOR = " AND ";
+
 	private static Logger log = Logger.getLogger(DemandController.class);
 
 	@FXML
@@ -41,6 +43,7 @@ public class DemandController {
 	private Text successMessage;
 	List<Demand> addItemList;
 	private DBQueriesUtils dbQueriesUtils;
+	private StringBuilder errorMessage;
 
 	@FXML
 	private void initialize() {
@@ -49,7 +52,7 @@ public class DemandController {
 		} catch (Exception e) {
 			successMessage.setText("Database errors occoured");
 		}
-
+		errorMessage = new StringBuilder("");
 		addItemList = new ArrayList<>();
 		DateUtils.initializeDate(demandDate);
 		itemListTable.setEditable(true);
@@ -105,45 +108,56 @@ public class DemandController {
 				demand.setQuantity(demandItem.getQuantity());
 				if (updateStockItemListBalance(demandItem))
 					dbQueriesUtils.getSession().save(demand);
+				else
+					successMessage.setText(errorMessage.toString());
 			} else
 				successMessage.setText("Cold Id " + demandItem.getColdNo()
-						+ " is not correct ! Verify that you made an entry in stock earlier.");
+				+ " is not correct ! Verify that you made an entry in stock earlier.");
 		});
 	}
 
 	private boolean updateStockItemListBalance(Demand demandItem) {
 		Optional<InwardStockItem> item = dbQueriesUtils.getStockItemList().stream()
-				.filter(ele -> ele.getColdNo().toString().equalsIgnoreCase(demandItem.getColdNo().toString()))
-				.findFirst();
-		if (item.isPresent()) {
-			if (item.get().getBalance() == 0) {
-				if ("".equalsIgnoreCase(successMessage.getText()))
-					successMessage.setText(" LOT " + item.get().getColdNo() + "Completed. Balance: 0");
-				else
-					successMessage.setText(successMessage.getText() + " AND " + " LOT " + item.get().getColdNo()
-							+ "Completed. Balance: 0");
-				return false;
-			}
+				.filter(ele -> ele.getColdNo().toString().equalsIgnoreCase(demandItem.getColdNo().toString())).findFirst();
+		Boolean flag = false;
+		if (item.isPresent())
+			flag = ifItemPresent(demandItem, item);
+		else
+			flag = ifItemNotPresent();
+		return flag;
+	}
+
+	private boolean ifItemNotPresent() {
+		if ("".equalsIgnoreCase(successMessage.getText()))
+			errorMessage.append("Cold No Does not exist. Please enter correct Cold No to place Demand.");
+		else
+			errorMessage.append(successMessage.getText() + MESSAGE_SEPERATOR
+					+ "Cold No Does not exist. Please enter correct Cold No to place Demand.");
+		return false;
+	}
+
+	private boolean ifItemPresent(Demand demandItem, Optional<InwardStockItem> item) {
+		if (item.isPresent()){
 			Integer balance = item.get().getBalance() - demandItem.getQuantity();
-			if (balance < 0) {
+			if (item.get().getBalance() == 0)
 				if ("".equalsIgnoreCase(successMessage.getText()))
-					successMessage.setText("Insufficient quantity avaiable for COLD No: " + item.get().getColdNo()
+					errorMessage.append(" LOT " + item.get().getColdNo() + " Completed. Balance: 0");
+				else
+					errorMessage.append(successMessage.getText() + MESSAGE_SEPERATOR + " LOT " + item.get().getColdNo()
+							+ "Completed. Balance: 0");
+			else if (balance < 0)
+				if ("".equalsIgnoreCase(successMessage.getText()))
+					errorMessage.append("Insufficient quantity avaiable for COLD No: " + item.get().getColdNo()
 							+ ". Available: " + item.get().getBalance());
 				else
-					successMessage
-							.setText(successMessage.getText() + " AND " + "Insufficient quantity avaiable for COLD No: "
-									+ item.get().getColdNo() + ". Available: " + item.get().getBalance());
-				return false;
+					errorMessage.append(errorMessage + MESSAGE_SEPERATOR + "Insufficient quantity avaiable for COLD No: "
+							+ item.get().getColdNo() + ". Available: " + item.get().getBalance());
+			else{
+				item.get().setBalance(balance);
+				dbQueriesUtils.getSession().update(item.get());
+				return true;
 			}
-			item.get().setBalance(balance);
-			dbQueriesUtils.getSession().update(item.get());
-			return true;
-		} else {
-			if ("".equalsIgnoreCase(successMessage.getText()))
-				successMessage.setText("Cold No Does not exist. Please enter correct Cold No to place Demand.");
-			else
-				successMessage.setText(successMessage.getText() + " AND "
-						+ "Cold No Does not exist. Please enter correct Cold No to place Demand.");
+			return false;
 		}
 		return false;
 	}

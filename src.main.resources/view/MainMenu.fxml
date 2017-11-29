@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.effect.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane blendMode="GREEN" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.mg.controller.LoadTabFxmlActionController">
+<AnchorPane blendMode="GREEN" prefHeight="529.0" prefWidth="866.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mg.controller.LoadTabFxmlActionController">
   <!-- TODO Add Nodes -->
   <children>
     <TabPane layoutX="0.0" layoutY="0.0" minHeight="-Infinity" minWidth="-Infinity">
@@ -27,14 +24,19 @@
             <fx:include id="stockTally" fx:id="demand" source="Demand.fxml" />
           </content>
         </Tab>
-        <Tab fx:id="billingTab" closable="false" text="Billing">
-          <content>
-            <fx:include fx:id="billing" source="Billing.fxml" />
-          </content>
-        </Tab>
         <Tab fx:id="coldVyaapariTab" closable="false" text="Cold/Vyaapari">
           <content>
             <fx:include id="customerDetails" fx:id="coldVyaapariDetails" source="ColdStorage.fxml" />
+          </content>
+        </Tab>
+        <Tab fx:id="completedstocksTab" closable="false" text="Completed Stock">
+          <content>
+            <fx:include fx:id="completedstocksTabDetails" source="CompletedStocks.fxml" />
+          </content>
+        </Tab>
+        <Tab fx:id="billingTab" closable="false" text="Billing">
+          <content>
+            <fx:include fx:id="billing" source="Billing.fxml" />
           </content>
         </Tab>
       </tabs>

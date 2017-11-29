@@ -26,6 +26,8 @@ public class LoadTabFxmlActionController {
 	private Tab demandTab;
 	@FXML
 	private Tab coldVyaapariTab;
+	@FXML
+	private Tab completedstocksTab;
 
 	@FXML
 	protected void initialize() {
@@ -34,6 +36,7 @@ public class LoadTabFxmlActionController {
 		demandTab.setOnSelectionChanged(event -> loadTabBasedFXML(demandTab, "/view/Demand.fxml"));
 		billingTab.setOnSelectionChanged(event -> loadTabBasedFXML(billingTab, "/view/Billing.fxml"));
 		coldVyaapariTab.setOnSelectionChanged(event -> loadTabBasedFXML(coldVyaapariTab, "/view/ColdStorage.fxml"));
+		completedstocksTab.setOnSelectionChanged(event -> loadTabBasedFXML(completedstocksTab, "/view/CompletedStocks.fxml"));
 	}
 
 	private void loadTabBasedFXML(Tab tab, String fxmlPath) {
@@ -41,7 +44,6 @@ public class LoadTabFxmlActionController {
 			AnchorPane anchorPane = FXMLLoader.load(this.getClass().getResource(fxmlPath));
 			tab.setContent(anchorPane);
 		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 }
