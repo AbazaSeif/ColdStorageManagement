@@ -7,6 +7,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -24,9 +25,9 @@ public class Main extends Application {
 				Scene scene = new Scene(root);
 				Stage stage = new Stage();
 				stage.setScene(scene);
-				stage.setTitle("Cold Store Management System");
+				stage.setTitle("Stock Management System");
 				stage.showAndWait();
-
+				stage.getIcons().add(new Image(getClass().getResourceAsStream("/image/leo.jpg")));
 				stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 					@Override
 					public void handle(WindowEvent event) {
