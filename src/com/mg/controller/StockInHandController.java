@@ -142,7 +142,7 @@ public class StockInHandController {
 
 		itemColdStore.setCellValueFactory((CellDataFeatures<InwardStockItem, String> data) -> {
 			Optional<ColdStorage> coldObject = dbQueriesUtils.getColdStorageList().stream()
-					.filter(cold -> cold.getColdId() == data.getValue().getInwardStock().getColdId()).findFirst();
+					.filter(cold -> data.getValue().getInwardStock().getColdId() == cold.getColdId() || data.getValue().getInwardStock().getColdId().equals(cold.getColdId())).findAny();
 			return new SimpleStringProperty(coldObject.get().getColdName());
 		});
 	}

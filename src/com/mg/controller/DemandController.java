@@ -15,11 +15,13 @@ import com.mg.utils.DateUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 
 public class DemandController {
@@ -44,6 +46,10 @@ public class DemandController {
 	List<Demand> addItemList;
 	private DBQueriesUtils dbQueriesUtils;
 	private StringBuilder errorMessage;
+	@FXML
+	private Button addDemandToListButton;
+	@FXML
+	private Button submitDemandButton;
 
 	@FXML
 	private void initialize() {
@@ -58,6 +64,18 @@ public class DemandController {
 		itemListTable.setEditable(true);
 		tableColdNo.setCellValueFactory(new PropertyValueFactory<Demand, String>("coldNo"));
 		tableQuantity.setCellValueFactory(new PropertyValueFactory<Demand, String>("quantity"));
+		initializeButtonKeyActions();
+	}
+
+	private void initializeButtonKeyActions() {
+		addDemandToListButton.setOnKeyPressed(e ->{
+			if(e.getCode().equals(KeyCode.ENTER))
+				addDemandToList();
+		});
+		submitDemandButton.setOnKeyPressed(e ->{
+			if(e.getCode().equals(KeyCode.ENTER))
+				submitDemand();
+		});
 	}
 
 	@FXML

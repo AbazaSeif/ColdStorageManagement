@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
@@ -39,11 +40,19 @@ public class LoginController {
 	private Text successMessage;
 
 	@FXML
+	public void initialize(){
+		btnLogin.setOnKeyPressed(e ->{
+			if(e.getCode().equals(KeyCode.ENTER))
+				btnLogin();
+		});
+
+	}
+
+	@FXML
 	public void btnLogin() {
 		try (FileReader reader = new FileReader(RESOURCES_LOGIN_PROPERTIES)) {
 			Properties p = new Properties();
 			p.load(reader);
-
 			if (tfUserName.getText().equalsIgnoreCase(p.getProperty(USERNAME))
 					&& pfUserPassword.getText().equalsIgnoreCase(p.getProperty(PASSWORD)))
 				makePane(VIEW_MAIN_MENU_FXML);

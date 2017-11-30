@@ -18,12 +18,14 @@ import com.mg.utils.DateUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 
 /**
@@ -71,6 +73,11 @@ public class InwardStockController {
 	private TableColumn<InwardStockItem, String> tableRate;
 
 	@FXML
+	private Button addButton;
+	@FXML
+	private Button submitButton;
+
+	@FXML
 	private Text successMessage;
 	private DBQueriesUtils dbQueriesUtils;
 
@@ -83,6 +90,7 @@ public class InwardStockController {
 		}
 		initializeItems();
 		initializeTable();
+		initializeButtonKeyAction();
 	}
 
 	private void initializeItems() {
@@ -100,6 +108,18 @@ public class InwardStockController {
 		tableItem.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("item"));
 		tableQuantity.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("quantity"));
 		tableRate.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("rate"));
+	}
+
+	private void initializeButtonKeyAction() {
+		addButton.setOnKeyPressed(e ->{
+			if(e.getCode().equals(KeyCode.ENTER))
+				addItemToList();
+		});
+
+		submitButton.setOnKeyPressed(e ->{
+			if(e.getCode().equals(KeyCode.ENTER))
+				submitStock();
+		});
 	}
 
 	@FXML

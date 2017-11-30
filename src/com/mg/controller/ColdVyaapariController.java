@@ -11,12 +11,14 @@ import com.mg.utils.DateUtils;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 
 /**
@@ -63,13 +65,18 @@ public class ColdVyaapariController {
 	private TableColumn<Vyaapari, String> listVyaapariAddress;
 
 	@FXML
-	Tab addVyaapari;
+	private Tab addVyaapari;
 	@FXML
-	Tab addColdStorage;
+	private Tab addColdStorage;
 	@FXML
-	Tab coldStoreListTab;
+	private Tab coldStoreListTab;
 	@FXML
-	Tab vyaapariListTab;
+	private Tab vyaapariListTab;
+
+	@FXML
+	private Button addColdStoreButton;
+	@FXML
+	private Button addVyaapariButton;
 
 	@FXML
 	private Text successMessage;
@@ -87,6 +94,19 @@ public class ColdVyaapariController {
 		initializeDate();
 		initializeColdTable();
 		initializeVyaapariTable();
+		initializeButtonKeyAction();
+	}
+
+	private void initializeButtonKeyAction() {
+		addColdStoreButton.setOnKeyPressed(e ->{
+			if(e.getCode().equals(KeyCode.ENTER))
+				addColdStorage();
+		});
+
+		addVyaapariButton.setOnKeyPressed(e ->{
+			if(e.getCode().equals(KeyCode.ENTER))
+				addVyaapari();
+		});
 	}
 
 	private void initializeDate() {
