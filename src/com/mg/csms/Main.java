@@ -24,10 +24,10 @@ public class Main extends Application {
 				Parent root = (Parent) FXMLLoader.load(getClass().getResource("/view/Login.fxml"));
 				Scene scene = new Scene(root);
 				Stage stage = new Stage();
+				stage.getIcons().add(new Image(getClass().getResourceAsStream("/image/logo.jpg")));
 				stage.setScene(scene);
 				stage.setTitle("Stock Management System");
 				stage.showAndWait();
-				stage.getIcons().add(new Image(getClass().getResourceAsStream("/image/leo.jpg")));
 				stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 					@Override
 					public void handle(WindowEvent event) {
