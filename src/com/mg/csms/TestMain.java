@@ -1,23 +1,25 @@
 package com.mg.csms;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import java.sql.Date;
+import java.time.LocalDate;
+
+import com.mg.csms.beans.ColdStorage;
 
 public class TestMain {
 
 	public static void main(String[] args) {
+		ColdStorage coldObject = makeColdObject();
 
-		ArrayList<Integer> list = new ArrayList<>();
+	}
 
-		list.add(1);
-		list.add(2);
-		list.add(3);
-		list.add(4);
-		list.add(5);
+	private static ColdStorage makeColdObject() {
+		ColdStorage cold = new ColdStorage();
+		cold.setColdId(1);
+		cold.setColdName("Ambey Cold");
+		cold.setAddress("Kundli");
+		cold.setDate(Date.valueOf(LocalDate.now()));
+		cold.setPhoneNo(8985878545L);
 
-		Optional<Integer> coldObject = list.stream()
-				.filter(item -> item == 2).findFirst();
-
-		System.out.println(coldObject.get());
+		return cold;
 	}
 }
