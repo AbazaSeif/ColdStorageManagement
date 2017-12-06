@@ -9,8 +9,12 @@ import org.testng.annotations.Test;
 
 import com.mg.csms.beans.ColdStorage;
 import com.mg.csms.beans.Vyaapari;
-import com.mg.utils.JSONWriter;
+import com.mg.jsonhandler.JSONWriter;
 
+/**
+ * @author Mohak Gupta
+ *
+ */
 public class TestJsonCreation {
 	@Test
 	public void f() {
@@ -19,7 +23,7 @@ public class TestJsonCreation {
 		Map<Integer, Object> coldMap = new HashMap<>();
 		coldMap.put(coldObject.getColdId(), coldObject);
 		coldMap.put(coldObject1.getColdId(), coldObject1);
-		JSONWriter.writeObjectToJson("ColdStorage", coldMap);
+		new JSONWriter().writeObjectToJson("ColdStorage", coldMap);
 
 		Vyaapari vyaapari = new Vyaapari();
 		vyaapari.setVyaapariId(1);
@@ -28,7 +32,7 @@ public class TestJsonCreation {
 		Map<Integer, Object> vyaapariMap = new HashMap<>();
 		vyaapariMap.put(vyaapari.getVyaapariId(), vyaapari);
 
-		JSONWriter.writeObjectToJson("Vyaapari", vyaapariMap);
+		new JSONWriter().writeObjectToJson("Vyaapari", vyaapariMap);
 
 	}
 

@@ -4,15 +4,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Transaction;
 
 import com.mg.csms.beans.InwardStock;
 import com.mg.csms.beans.InwardStockItem;
-import com.mg.utils.DBQueriesUtils;
+import com.mg.jsonhandler.JSONParser;
+import com.mg.jsonhandler.JSONWriter;
 import com.mg.utils.DateUtils;
 
 import javafx.collections.FXCollections;
@@ -79,12 +81,14 @@ public class InwardStockController {
 
 	@FXML
 	private Text successMessage;
-	private DBQueriesUtils dbQueriesUtils;
+	private JSONWriter jsonWriter;
+	private JSONParser jsonParser;
 
 	@FXML
 	protected void initialize() {
 		try {
-			dbQueriesUtils = new DBQueriesUtils();
+			jsonWriter = new JSONWriter();
+			jsonParser = new JSONParser();
 		} catch (Exception e) {
 			successMessage.setText("Database errors occoured");
 		}
@@ -111,13 +115,13 @@ public class InwardStockController {
 	}
 
 	private void initializeButtonKeyAction() {
-		addButton.setOnKeyPressed(e ->{
-			if(e.getCode().equals(KeyCode.ENTER))
+		addButton.setOnKeyPressed(e -> {
+			if (e.getCode().equals(KeyCode.ENTER))
 				addItemToList();
 		});
 
-		submitButton.setOnKeyPressed(e ->{
-			if(e.getCode().equals(KeyCode.ENTER))
+		submitButton.setOnKeyPressed(e -> {
+			if (e.getCode().equals(KeyCode.ENTER))
 				submitStock();
 		});
 	}
@@ -153,16 +157,29 @@ public class InwardStockController {
 	@FXML
 	protected void submitStock() {
 		try {
-			Transaction tx = dbQueriesUtils.getSession().beginTransaction();
 			InwardStock stock = makeInwardStock(new InwardStock());
-			dbQueriesUtils.getSession().save(stock);
+			writeInwardStockToJson(stock);
 			makeInwardStockItemsAndSave(stock);
-			tx.commit();
 			successMessage.setText("Lot added successfully.");
 		} catch (Exception e) {
 			successMessage.setText("Make sure you have entererd all fields correctly !");
 		}
 		clearOverallUI();
+	}
+
+	// TODO - CHECK THE WORKING
+	public void writeInwardStockToJson(InwardStock stock) {
+		Integer maxKey = 0;
+		Map<Integer, Object> map = new HashMap<>();
+		try {
+			map = jsonParser.getObjectFromJsonFile("InwardStock");
+			maxKey = Collections.max(map.keySet());
+		} catch (IOException ex) {
+			log.error(ex.getMessage());
+		}
+		stock.setStockId(maxKey + 1);
+		map.put(stock.getStockId(), stock);
+		jsonWriter.writeObjectToJson("InwardStock", map);
 	}
 
 	private void makeInwardStockItemsAndSave(InwardStock stock) {
@@ -177,7 +194,7 @@ public class InwardStockController {
 			item.setEntryDate(stock.getDate());
 			item.setGadiNo(stock.getGadiNo());
 			item.setBalance(itemStockItem.getQuantity());
-			dbQueriesUtils.getSession().save(item);
+			// dbQueriesUtils.getSession().save(item);
 		});
 	}
 
@@ -204,17 +221,20 @@ public class InwardStockController {
 	}
 
 	private ObservableList<String> getColdStoreList() {
-		dbQueriesUtils.makeColdStorageList();
+		// dbQueriesUtils.makeColdStorageList();
 		List<String> coldStoreNameList = new ArrayList<>();
-		dbQueriesUtils.getColdStorageList().forEach(cold -> coldStoreNameList.add(cold.getColdId() + ": " + cold.getColdName()));
+		// dbQueriesUtils.getColdStorageList()
+		// .forEach(cold -> coldStoreNameList.add(cold.getColdId() + ": " +
+		// cold.getColdName()));
 		return FXCollections.observableList(coldStoreNameList);
 	}
 
 	private ObservableList<String> getVyaapariList() {
-		dbQueriesUtils.makeVyaapariList();
+		// dbQueriesUtils.makeVyaapariList();
 		List<String> vyaapariNameList = new ArrayList<>();
-		dbQueriesUtils.getVyaapariArrayList().forEach(
-				vyaapari -> vyaapariNameList.add(vyaapari.getVyaapariId() + ": " + vyaapari.getVyaapariName()));
+		// dbQueriesUtils.getVyaapariArrayList().forEach(
+		// vyaapari -> vyaapariNameList.add(vyaapari.getVyaapariId() + ": " +
+		// vyaapari.getVyaapariName()));
 		return FXCollections.observableList(vyaapariNameList);
 	}
 

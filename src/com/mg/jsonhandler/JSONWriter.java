@@ -1,4 +1,4 @@
-package com.mg.utils;
+package com.mg.jsonhandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,18 +10,23 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mg.stock.constant.StockConstants;
 
+/**
+ * @author Mohak Gupta
+ *
+ */
 public class JSONWriter {
 
 	private static Logger log = Logger.getLogger(JSONWriter.class);
 
-	public static void writeObjectToJson(String fileName, Map<Integer, Object> jsonObject) {
+	public void writeObjectToJson(String fileName, Map<Integer, Object> jsonObject) {
 		createDirectory(fileName);
 		File file = createFileIfNotExist(fileName);
 		writeObjectToFile(jsonObject, file);
 	}
 
-	private static void writeObjectToFile(Map<Integer, Object> jsonObject, File file) {
+	private void writeObjectToFile(Map<Integer, Object> jsonObject, File file) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.writeValue(file, jsonObject);
@@ -30,8 +35,8 @@ public class JSONWriter {
 		}
 	}
 
-	private static File createFileIfNotExist(String fileName) {
-		File file = new File("C:\\AU\\DATA\\" + fileName + ".json");
+	private File createFileIfNotExist(String fileName) {
+		File file = new File(StockConstants.DIRECTORY_PATH + fileName + StockConstants.JSON_SUFFIX);
 		try {
 			if (!file.exists())
 				file.createNewFile();
@@ -41,8 +46,8 @@ public class JSONWriter {
 		return file;
 	}
 
-	private static void createDirectory(String fileName) {
-		Path path = Paths.get("C:\\AU\\DATA");
+	private void createDirectory(String fileName) {
+		Path path = Paths.get(StockConstants.DIRECTORY_PATH);
 		if (!Files.exists(path)) {
 			try {
 				Files.createDirectories(path);
