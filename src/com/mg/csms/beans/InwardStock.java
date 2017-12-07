@@ -1,7 +1,7 @@
 package com.mg.csms.beans;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -13,7 +13,7 @@ public class InwardStock implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Integer stockId;
-	private Date date;
+	private LocalDate date;
 	private Integer coldId;
 	private Integer vyaapariId;
 	private Integer qty;
@@ -28,11 +28,11 @@ public class InwardStock implements Serializable {
 		this.stockId = stockId;
 	}
 
-	public Date getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 

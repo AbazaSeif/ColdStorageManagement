@@ -1,7 +1,7 @@
 package com.mg.csms.beans;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * @author Mohak Gupta
@@ -11,7 +11,7 @@ public class Vyaapari extends Contact implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Integer vyaapariId;
-	private Date date;
+	private LocalDate date;
 	private String vyaapariName;
 
 	public Integer getVyaapariId() {
@@ -30,20 +30,12 @@ public class Vyaapari extends Contact implements Serializable {
 		this.vyaapariName = vyaapariName;
 	}
 
-	public Date getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
-	}
-
-	public String getColdName() {
-		return vyaapariName;
-	}
-
-	public void setColdName(String vyaapariName) {
-		this.vyaapariName = vyaapariName;
 	}
 
 }

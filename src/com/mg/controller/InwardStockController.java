@@ -11,8 +11,10 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import com.mg.csms.beans.ColdStorage;
 import com.mg.csms.beans.InwardStock;
 import com.mg.csms.beans.InwardStockItem;
+import com.mg.csms.beans.Vyaapari;
 import com.mg.jsonhandler.JSONParser;
 import com.mg.jsonhandler.JSONWriter;
 import com.mg.utils.DateUtils;
@@ -128,7 +130,11 @@ public class InwardStockController {
 
 	@FXML
 	protected void addItemToList() {
-		itemListTable.setItems(getInwardStockItem());
+		try {
+			itemListTable.setItems(getInwardStockItem());
+		} catch (Exception e) {
+			successMessage.setText("Make sure you have entererd all fields correctly !");
+		}
 	}
 
 	private ObservableList<InwardStockItem> getInwardStockItem() {
@@ -167,19 +173,18 @@ public class InwardStockController {
 		clearOverallUI();
 	}
 
-	// TODO - CHECK THE WORKING
 	public void writeInwardStockToJson(InwardStock stock) {
 		Integer maxKey = 0;
-		Map<Integer, Object> map = new HashMap<>();
+		Map<Integer, Object> stockMap = new HashMap<>();
 		try {
-			map = jsonParser.getObjectFromJsonFile("InwardStock");
-			maxKey = Collections.max(map.keySet());
+			stockMap = jsonParser.getObjectFromJsonFile("InwardStock");
+			maxKey = Collections.max(stockMap.keySet());
 		} catch (IOException ex) {
 			log.error(ex.getMessage());
 		}
 		stock.setStockId(maxKey + 1);
-		map.put(stock.getStockId(), stock);
-		jsonWriter.writeObjectToJson("InwardStock", map);
+		stockMap.put(stock.getStockId(), stock);
+		jsonWriter.writeObjectToJson("InwardStock", stockMap);
 	}
 
 	private void makeInwardStockItemsAndSave(InwardStock stock) {
@@ -221,20 +226,29 @@ public class InwardStockController {
 	}
 
 	private ObservableList<String> getColdStoreList() {
-		// dbQueriesUtils.makeColdStorageList();
+		Map<Integer, Object> coldStoreMap = new HashMap<>();
+		try {
+			coldStoreMap = jsonParser.getObjectFromJsonFile("ColdStorage");
+		} catch (IOException e) {
+			log.error(e.getMessage());
+		}
+		List<ColdStorage> coldStoreList = new ArrayList(coldStoreMap.values());
 		List<String> coldStoreNameList = new ArrayList<>();
-		// dbQueriesUtils.getColdStorageList()
-		// .forEach(cold -> coldStoreNameList.add(cold.getColdId() + ": " +
-		// cold.getColdName()));
+		coldStoreList.forEach(cold -> coldStoreNameList.add(cold.getColdId() + ": " + cold.getColdName()));
 		return FXCollections.observableList(coldStoreNameList);
 	}
 
 	private ObservableList<String> getVyaapariList() {
-		// dbQueriesUtils.makeVyaapariList();
 		List<String> vyaapariNameList = new ArrayList<>();
-		// dbQueriesUtils.getVyaapariArrayList().forEach(
-		// vyaapari -> vyaapariNameList.add(vyaapari.getVyaapariId() + ": " +
-		// vyaapari.getVyaapariName()));
+		Map<Integer, Object> vyaapariStoreMap = new HashMap<>();
+		try {
+			vyaapariStoreMap = jsonParser.getObjectFromJsonFile("Vyaapari");
+		} catch (IOException e) {
+			log.error(e.getMessage());
+		}
+		List<Vyaapari> vyaapariList = new ArrayList(vyaapariStoreMap.values());
+		vyaapariList.forEach(
+				vyaapari -> vyaapariNameList.add(vyaapari.getVyaapariId() + ": " + vyaapari.getVyaapariName()));
 		return FXCollections.observableList(vyaapariNameList);
 	}
 

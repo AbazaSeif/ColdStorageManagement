@@ -1,7 +1,7 @@
 package com.mg.csms.beans;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * @author Mohak Gupta
@@ -11,7 +11,7 @@ public class ColdStorage extends Contact implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Integer coldId;
-	private Date date;
+	private LocalDate date;
 	private String coldName;
 
 	public Integer getColdId() {
@@ -22,11 +22,11 @@ public class ColdStorage extends Contact implements Serializable {
 		this.coldId = coldId;
 	}
 
-	public Date getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 

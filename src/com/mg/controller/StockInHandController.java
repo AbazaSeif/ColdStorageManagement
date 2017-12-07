@@ -12,7 +12,6 @@ import com.mg.csms.beans.ColdStorage;
 import com.mg.csms.beans.Demand;
 import com.mg.csms.beans.InwardStock;
 import com.mg.csms.beans.InwardStockItem;
-import com.mg.utils.DBQueriesUtils;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -73,12 +72,9 @@ public class StockInHandController {
 	@FXML
 	private TableColumn<Demand, String> demandTableQuantity;
 
-	private DBQueriesUtils dbQueriesUtils;
-
 	@FXML
 	protected void initialize() {
 		try {
-			dbQueriesUtils = new DBQueriesUtils();
 		} catch (Exception e) {
 			log.debug(e);
 		}
@@ -98,9 +94,12 @@ public class StockInHandController {
 	}
 
 	private void populateDemandTable(Integer coldNo) {
-		demandListToShow = dbQueriesUtils.getDemandList().stream()
-				.filter(demand -> demand.getColdNo().toString().equalsIgnoreCase(coldNo.toString()))
-				.collect(Collectors.toList());
+		/*
+		 * demandListToShow = dbQueriesUtils.getDemandList().stream()
+		 * .filter(demand ->
+		 * demand.getColdNo().toString().equalsIgnoreCase(coldNo.toString()))
+		 * .collect(Collectors.toList());
+		 */
 		demandListTable.setItems(FXCollections.observableList(demandListToShow));
 	}
 
@@ -142,7 +141,9 @@ public class StockInHandController {
 
 		itemColdStore.setCellValueFactory((CellDataFeatures<InwardStockItem, String> data) -> {
 			Optional<ColdStorage> coldObject = dbQueriesUtils.getColdStorageList().stream()
-					.filter(cold -> data.getValue().getInwardStock().getColdId() == cold.getColdId() || data.getValue().getInwardStock().getColdId().equals(cold.getColdId())).findAny();
+					.filter(cold -> data.getValue().getInwardStock().getColdId() == cold.getColdId()
+							|| data.getValue().getInwardStock().getColdId().equals(cold.getColdId()))
+					.findAny();
 			return new SimpleStringProperty(coldObject.get().getColdName());
 		});
 	}

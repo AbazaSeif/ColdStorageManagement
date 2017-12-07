@@ -1,7 +1,5 @@
 package com.mg.csms;
 
-import com.mg.csms.database.SessionCreation;
-
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -20,25 +18,23 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			if (SessionCreation.getSessionInstance() != null) {
-				Parent root = (Parent) FXMLLoader.load(getClass().getResource("/view/Login.fxml"));
-				Scene scene = new Scene(root);
-				Stage stage = new Stage();
-				stage.getIcons().add(new Image(getClass().getResourceAsStream("/image/logo.jpg")));
-				stage.setScene(scene);
-				stage.setTitle("Stock Management System");
-				stage.showAndWait();
-				stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-					@Override
-					public void handle(WindowEvent event) {
-						try {
-							stop();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+			Parent root = (Parent) FXMLLoader.load(getClass().getResource("/view/Login.fxml"));
+			Scene scene = new Scene(root);
+			Stage stage = new Stage();
+			stage.getIcons().add(new Image(getClass().getResourceAsStream("/image/logo.jpg")));
+			stage.setScene(scene);
+			stage.setTitle("Stock Management System");
+			stage.showAndWait();
+			stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+				@Override
+				public void handle(WindowEvent event) {
+					try {
+						stop();
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-				});
-			}
+				}
+			});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -46,6 +42,5 @@ public class Main extends Application {
 
 	public static void main(String[] args) {
 		launch(args);
-		SessionCreation.closeSession();
 	}
 }

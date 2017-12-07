@@ -5,11 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Transaction;
 
 import com.mg.csms.beans.Demand;
 import com.mg.csms.beans.InwardStockItem;
-import com.mg.utils.DBQueriesUtils;
 import com.mg.utils.DateUtils;
 
 import javafx.collections.FXCollections;
@@ -44,7 +42,6 @@ public class DemandController {
 	@FXML
 	private Text successMessage;
 	List<Demand> addItemList;
-	private DBQueriesUtils dbQueriesUtils;
 	private StringBuilder errorMessage;
 	@FXML
 	private Button addDemandToListButton;
@@ -54,7 +51,6 @@ public class DemandController {
 	@FXML
 	private void initialize() {
 		try {
-			dbQueriesUtils = new DBQueriesUtils();
 		} catch (Exception e) {
 			successMessage.setText("Database errors occoured");
 		}
@@ -68,12 +64,12 @@ public class DemandController {
 	}
 
 	private void initializeButtonKeyActions() {
-		addDemandToListButton.setOnKeyPressed(e ->{
-			if(e.getCode().equals(KeyCode.ENTER))
+		addDemandToListButton.setOnKeyPressed(e -> {
+			if (e.getCode().equals(KeyCode.ENTER))
 				addDemandToList();
 		});
-		submitDemandButton.setOnKeyPressed(e ->{
-			if(e.getCode().equals(KeyCode.ENTER))
+		submitDemandButton.setOnKeyPressed(e -> {
+			if (e.getCode().equals(KeyCode.ENTER))
 				submitDemand();
 		});
 	}
@@ -105,9 +101,9 @@ public class DemandController {
 	private void submitDemand() {
 		try {
 			successMessage.setText("");
-			Transaction tx = dbQueriesUtils.getSession().beginTransaction();
+			// Transaction tx = dbQueriesUtils.getSession().beginTransaction();
 			makeDemandItemsAndSave();
-			tx.commit();
+			// tx.commit();
 		} catch (Exception e) {
 			log.debug(e);
 			successMessage.setText("Some Error Occured !!! Make sure you have entererd all fields correctly !");
@@ -125,24 +121,26 @@ public class DemandController {
 				demand.setDemandDate(DateUtils.makeDate(demandDate));
 				demand.setQuantity(demandItem.getQuantity());
 				if (updateStockItemListBalance(demandItem))
-					dbQueriesUtils.getSession().save(demand);
+					// dbQueriesUtils.getSession().save(demand);
+					;
 				else
 					successMessage.setText(errorMessage.toString());
 			} else
 				successMessage.setText("Cold Id " + demandItem.getColdNo()
-				+ " is not correct ! Verify that you made an entry in stock earlier.");
+						+ " is not correct ! Verify that you made an entry in stock earlier.");
 		});
 	}
 
 	private boolean updateStockItemListBalance(Demand demandItem) {
-		Optional<InwardStockItem> item = dbQueriesUtils.getStockItemList().stream()
-				.filter(ele -> ele.getColdNo().toString().equalsIgnoreCase(demandItem.getColdNo().toString())).findFirst();
-		Boolean flag = false;
-		if (item.isPresent())
-			flag = ifItemPresent(demandItem, item);
-		else
-			flag = ifItemNotPresent();
-		return flag;
+		/*
+		 * Optional<InwardStockItem> item =
+		 * dbQueriesUtils.getStockItemList().stream() .filter(ele ->
+		 * ele.getColdNo().toString().equalsIgnoreCase(demandItem.getColdNo().
+		 * toString())) .findFirst(); Boolean flag = false; if
+		 * (item.isPresent()) flag = ifItemPresent(demandItem, item); else flag
+		 * = ifItemNotPresent(); return flag;
+		 */
+		return true;
 	}
 
 	private boolean ifItemNotPresent() {
@@ -155,7 +153,7 @@ public class DemandController {
 	}
 
 	private boolean ifItemPresent(Demand demandItem, Optional<InwardStockItem> item) {
-		if (item.isPresent()){
+		if (item.isPresent()) {
 			Integer balance = item.get().getBalance() - demandItem.getQuantity();
 			if (item.get().getBalance() == 0)
 				if ("".equalsIgnoreCase(successMessage.getText()))
@@ -168,11 +166,12 @@ public class DemandController {
 					errorMessage.append("Insufficient quantity avaiable for COLD No: " + item.get().getColdNo()
 							+ ". Available: " + item.get().getBalance());
 				else
-					errorMessage.append(errorMessage + MESSAGE_SEPERATOR + "Insufficient quantity avaiable for COLD No: "
-							+ item.get().getColdNo() + ". Available: " + item.get().getBalance());
-			else{
+					errorMessage
+							.append(errorMessage + MESSAGE_SEPERATOR + "Insufficient quantity avaiable for COLD No: "
+									+ item.get().getColdNo() + ". Available: " + item.get().getBalance());
+			else {
 				item.get().setBalance(balance);
-				dbQueriesUtils.getSession().update(item.get());
+				// dbQueriesUtils.getSession().update(item.get());
 				return true;
 			}
 			return false;
@@ -181,7 +180,9 @@ public class DemandController {
 	}
 
 	private boolean isValidColdNo(Integer coldNo) {
-		return dbQueriesUtils.getStockItemList().stream().anyMatch(item -> item.getColdNo().equals(coldNo));
+		// return dbQueriesUtils.getStockItemList().stream().anyMatch(item ->
+		// item.getColdNo().equals(coldNo));
+		return true;
 	}
 
 	private void clearOverallUI() {

@@ -55,9 +55,10 @@ public class JSONParser {
 					break;
 				}
 			else
-				throw new IOException("File " + fileName + " Does Not Exists ! ");
+				return objectMap;
 		} catch (IOException e) {
 			log.error(e.getMessage());
+
 			throw new IOException("File " + fileName + " Does Not Exists ! ");
 		}
 		return objectMap;

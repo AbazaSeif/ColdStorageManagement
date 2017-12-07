@@ -1,19 +1,19 @@
 package com.mg.csms.beans;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 public class Demand {
 
-	private Date demandDate;
+	private LocalDate demandDate;
 	private Integer demandId;
 	private Integer quantity;
 	private Integer coldNo;
 
-	public Date getDemandDate() {
+	public LocalDate getDemandDate() {
 		return demandDate;
 	}
 
-	public void setDemandDate(Date demandDate) {
+	public void setDemandDate(LocalDate demandDate) {
 		this.demandDate = demandDate;
 	}
 

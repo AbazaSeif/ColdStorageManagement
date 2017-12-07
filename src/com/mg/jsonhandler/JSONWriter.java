@@ -29,7 +29,7 @@ public class JSONWriter {
 	private void writeObjectToFile(Map<Integer, Object> jsonObject, File file) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
-			mapper.writeValue(file, jsonObject);
+			mapper.writerWithDefaultPrettyPrinter().writeValue(file, jsonObject);
 		} catch (IOException e) {
 			log.error("Error writting Object to Json File" + e);
 		}
