@@ -173,12 +173,13 @@ public class InwardStockController {
 		clearOverallUI();
 	}
 
-	public void writeInwardStockToJson(InwardStock stock) {
+	private void writeInwardStockToJson(InwardStock stock) {
 		Integer maxKey = 0;
 		Map<Integer, Object> stockMap = new HashMap<>();
 		try {
 			stockMap = jsonParser.getObjectFromJsonFile("InwardStock");
-			maxKey = Collections.max(stockMap.keySet());
+			if (!stockMap.isEmpty())
+				maxKey = Collections.max(stockMap.keySet());
 		} catch (IOException ex) {
 			log.error(ex.getMessage());
 		}
@@ -195,12 +196,27 @@ public class InwardStockController {
 			item.setQuantity(itemStockItem.getQuantity());
 			item.setRate(itemStockItem.getRate());
 			item.setLotNo(itemStockItem.getLotNo());
-			item.setInwardStock(stock);
 			item.setEntryDate(stock.getDate());
 			item.setGadiNo(stock.getGadiNo());
+			item.setStockId(stock.getStockId());
 			item.setBalance(itemStockItem.getQuantity());
-			// dbQueriesUtils.getSession().save(item);
+			writeItemToJson(item);
 		});
+	}
+
+	private void writeItemToJson(InwardStockItem item) {
+		Integer maxKey = 0;
+		Map<Integer, Object> itemMap = new HashMap<>();
+		try {
+			itemMap = jsonParser.getObjectFromJsonFile("InwardStockItem");
+			if (!itemMap.isEmpty())
+				maxKey = Collections.max(itemMap.keySet());
+		} catch (IOException ex) {
+			log.error(ex.getMessage());
+		}
+		item.setRecordId(maxKey + 1);
+		itemMap.put(item.getRecordId(), item);
+		jsonWriter.writeObjectToJson("InwardStockItem", itemMap);
 	}
 
 	private InwardStock makeInwardStock(InwardStock inwardStock) {

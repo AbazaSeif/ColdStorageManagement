@@ -234,6 +234,7 @@ public class ColdVyaapariController {
 		vyaapari.setAddress(vyaapariAddress.getText());
 		vyaapari.setPhoneNo(Long.parseLong(vyaapariNumber.getText()));
 		vyaapari.setDate(DateUtils.makeDate(vyaapariDate));
+		vyaapari.setVyaapariName(vyaapariName.getText());
 		return vyaapari;
 	}
 

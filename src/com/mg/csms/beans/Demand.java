@@ -2,8 +2,14 @@ package com.mg.csms.beans;
 
 import java.time.LocalDate;
 
-public class Demand {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.mg.localdate.LocalDateDeserializer;
+import com.mg.localdate.LocalDateSerializer;
 
+public class Demand {
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonSerialize(using = LocalDateSerializer.class)
 	private LocalDate demandDate;
 	private Integer demandId;
 	private Integer quantity;

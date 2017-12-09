@@ -3,6 +3,11 @@ package com.mg.csms.beans;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.mg.localdate.LocalDateDeserializer;
+import com.mg.localdate.LocalDateSerializer;
+
 /**
  * @author Mohak Gupta
  *
@@ -17,7 +22,8 @@ public class InwardStockItem implements Serializable {
 	private String item;
 	private Integer quantity;
 	private Float rate;
-	private InwardStock inwardStock;
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonSerialize(using = LocalDateSerializer.class)
 	private LocalDate entryDate;
 	private String gadiNo;
 	private Integer balance;
@@ -79,14 +85,6 @@ public class InwardStockItem implements Serializable {
 
 	public void setRate(Float rate) {
 		this.rate = rate;
-	}
-
-	public InwardStock getInwardStock() {
-		return inwardStock;
-	}
-
-	public void setInwardStock(InwardStock inwardStock) {
-		this.inwardStock = inwardStock;
 	}
 
 	public LocalDate getEntryDate() {

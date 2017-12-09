@@ -43,7 +43,7 @@ public class JSONParser {
 					objectMap = mapper.readValue(file, new TypeReference<Map<Integer, InwardStock>>() {
 					});
 					break;
-				case "LotEntry":
+				case "InwardStockItem":
 					objectMap = mapper.readValue(file, new TypeReference<Map<Integer, InwardStockItem>>() {
 					});
 					break;
@@ -58,7 +58,6 @@ public class JSONParser {
 				return objectMap;
 		} catch (IOException e) {
 			log.error(e.getMessage());
-
 			throw new IOException("File " + fileName + " Does Not Exists ! ");
 		}
 		return objectMap;

@@ -2,7 +2,11 @@ package com.mg.csms.beans;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.List;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.mg.localdate.LocalDateDeserializer;
+import com.mg.localdate.LocalDateSerializer;
 
 /**
  * @author Mohak Gupta
@@ -13,12 +17,13 @@ public class InwardStock implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Integer stockId;
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonSerialize(using = LocalDateSerializer.class)
 	private LocalDate date;
 	private Integer coldId;
 	private Integer vyaapariId;
 	private Integer qty;
 	private String gadiNo;
-	private List<InwardStockItem> inwardStockList;
 
 	public Integer getStockId() {
 		return stockId;
@@ -66,14 +71,6 @@ public class InwardStock implements Serializable {
 
 	public void setGadiNo(String gadiNo) {
 		this.gadiNo = gadiNo;
-	}
-
-	public List<InwardStockItem> getInwardStockList() {
-		return inwardStockList;
-	}
-
-	public void setInwardStockList(List<InwardStockItem> inwardStockList) {
-		this.inwardStockList = inwardStockList;
 	}
 
 }
