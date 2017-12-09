@@ -1,11 +1,8 @@
 package com.mg.controller;
 
-import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -15,8 +12,7 @@ import com.mg.csms.beans.ColdStorage;
 import com.mg.csms.beans.Demand;
 import com.mg.csms.beans.InwardStock;
 import com.mg.csms.beans.InwardStockItem;
-import com.mg.csms.beans.Vyaapari;
-import com.mg.jsonhandler.JSONParser;
+import com.mg.utils.JsonUtils;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -77,12 +73,12 @@ public class StockInHandController {
 	@FXML
 	private TableColumn<Demand, String> demandTableQuantity;
 
-	private JSONParser jsonParser;
+	private JsonUtils jsonUtils;
 
 	@FXML
 	protected void initialize() {
 		try {
-			jsonParser = new JSONParser();
+			jsonUtils = JsonUtils.getInstance();
 		} catch (Exception e) {
 			log.debug(e);
 		}
@@ -102,22 +98,11 @@ public class StockInHandController {
 	}
 
 	private void populateDemandTable(Integer coldNo) {
-
-		demandListToShow = getDemandList().stream()
+		jsonUtils.makeDemandList();
+		demandListToShow = jsonUtils.getDemandList().stream()
 				.filter(demand -> demand.getColdNo().toString().equalsIgnoreCase(coldNo.toString()))
 				.collect(Collectors.toList());
-
 		demandListTable.setItems(FXCollections.observableList(demandListToShow));
-	}
-
-	private List<Demand> getDemandList() {
-		Map<Integer, Object> demandMap = new HashMap<>();
-		try {
-			demandMap = jsonParser.getObjectFromJsonFile("Demand");
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-		return new ArrayList(demandMap.values());
 	}
 
 	private void makeGadiNoChangeAction() {
@@ -157,7 +142,8 @@ public class StockInHandController {
 		itemBalance.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("balance"));
 
 		itemColdStore.setCellValueFactory((CellDataFeatures<InwardStockItem, String> data) -> {
-			Optional<InwardStock> stock = getStockList().stream()
+			jsonUtils.makeStockList();
+			Optional<InwardStock> stock = jsonUtils.getStockList().stream()
 					.filter(stockObject -> stockObject.getStockId() == data.getValue().getStockId()
 							|| stockObject.getStockId().equals(data.getValue().getStockId()))
 					.findAny();
@@ -171,14 +157,8 @@ public class StockInHandController {
 	}
 
 	private List<ColdStorage> getColdStoreList() {
-		Map<Integer, Object> coldStoreMap = new HashMap<>();
-		try {
-			coldStoreMap = jsonParser.getObjectFromJsonFile("ColdStorage");
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-		List<ColdStorage> coldStoreList = new ArrayList(coldStoreMap.values());
-		return coldStoreList;
+		jsonUtils.makeColdStoreList();
+		return jsonUtils.getColdStoreList();
 	}
 
 	private void initializeDemandListTableView() {
@@ -204,18 +184,9 @@ public class StockInHandController {
 	}
 
 	private void getVyaapariStockList() {
-		vyaapariStockList = getStockList().stream()
+		jsonUtils.makeStockList();
+		vyaapariStockList = jsonUtils.getStockList().stream()
 				.filter(element -> element.getVyaapariId() == vyaapariIdFromChoiceBox).collect(Collectors.toList());
-	}
-
-	private ArrayList<InwardStock> getStockList() {
-		Map<Integer, Object> stockList = new HashMap<>();
-		try {
-			stockList = jsonParser.getObjectFromJsonFile("InwardStock");
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-		return new ArrayList(stockList.values());
 	}
 
 	private void makeItemStockListForVyaapari(InwardStock vyaapariStock) {
@@ -237,25 +208,14 @@ public class StockInHandController {
 
 	private ObservableList<String> getVyaapariList() {
 		List<String> vyaapariNameList = new ArrayList<>();
-		Map<Integer, Object> vyaapariStoreMap = new HashMap<>();
-		try {
-			vyaapariStoreMap = jsonParser.getObjectFromJsonFile("Vyaapari");
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-		List<Vyaapari> vyaapariList = new ArrayList(vyaapariStoreMap.values());
-		vyaapariList.forEach(
+		jsonUtils.makeVyaapariList();
+		jsonUtils.getVyaapariList().forEach(
 				vyaapari -> vyaapariNameList.add(vyaapari.getVyaapariId() + ": " + vyaapari.getVyaapariName()));
 		return FXCollections.observableList(vyaapariNameList);
 	}
 
 	private List<InwardStockItem> getStockItemList() {
-		Map<Integer, Object> stockItemList = new HashMap<>();
-		try {
-			stockItemList = jsonParser.getObjectFromJsonFile("InwardStockItem");
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-		return new ArrayList(stockItemList.values());
+		jsonUtils.makeStockItemList();
+		return jsonUtils.getStockItemList();
 	}
 }

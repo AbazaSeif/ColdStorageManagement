@@ -1,19 +1,13 @@
 package com.mg.controller;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import com.mg.csms.beans.ColdStorage;
 import com.mg.csms.beans.Vyaapari;
-import com.mg.jsonhandler.JSONParser;
-import com.mg.jsonhandler.JSONWriter;
 import com.mg.utils.DateUtils;
+import com.mg.utils.JsonUtils;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -88,20 +82,14 @@ public class ColdVyaapariController {
 	@FXML
 	private Text successMessage1;
 
-	private JSONWriter jsonWriter;
-	private JSONParser jsonParser;
-	List<ColdStorage> coldStoreList;
-	List<Vyaapari> vyaapariList;
-	Map<Integer, Object> coldStoreMap;
-	Map<Integer, Object> vyaapariMap;
+	private JsonUtils jsonUtils;
 
 	@FXML
 	protected void initialize() {
 		try {
-			jsonWriter = new JSONWriter();
-			jsonParser = new JSONParser();
+			jsonUtils = JsonUtils.getInstance();
 		} catch (Exception e) {
-			successMessage.setText("Database errors occoured");
+			successMessage.setText("Error in File Handling.");
 		}
 
 		initializeDate();
@@ -110,25 +98,18 @@ public class ColdVyaapariController {
 		initializeButtonKeyAction();
 	}
 
+	private void initializeDate() {
+		DateUtils.initializeDate(coldDate);
+		DateUtils.initializeDate(vyaapariDate);
+	}
+
 	private void makeColdStoreList() {
-		coldStoreMap = new HashMap<>();
-		try {
-			coldStoreMap = jsonParser.getObjectFromJsonFile("ColdStorage");
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-		coldStoreList = new ArrayList(coldStoreMap.values());
+		jsonUtils.makeColdStoreList();
 		initializeColdTable();
 	}
 
 	private void makeVyaapariList() {
-		vyaapariMap = new HashMap<>();
-		try {
-			vyaapariMap = jsonParser.getObjectFromJsonFile("Vyaapari");
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-		vyaapariList = new ArrayList(vyaapariMap.values());
+		jsonUtils.makeVyaapariList();
 		initializeVyaapariTable();
 	}
 
@@ -144,18 +125,13 @@ public class ColdVyaapariController {
 		});
 	}
 
-	private void initializeDate() {
-		DateUtils.initializeDate(coldDate);
-		DateUtils.initializeDate(vyaapariDate);
-	}
-
 	private void initializeColdTable() {
 		coldListView.setEditable(true);
 		listColdName.setCellValueFactory(new PropertyValueFactory<ColdStorage, String>("coldName"));
 		listColdPhone.setCellValueFactory(new PropertyValueFactory<ColdStorage, String>("phoneNo"));
 		listColdAddress.setCellValueFactory(new PropertyValueFactory<ColdStorage, String>("address"));
-		if (!coldStoreList.isEmpty())
-			coldListView.setItems(FXCollections.observableList(coldStoreList));
+		if (!jsonUtils.getColdStoreList().isEmpty())
+			coldListView.setItems(FXCollections.observableList(jsonUtils.getColdStoreList()));
 	}
 
 	private void initializeVyaapariTable() {
@@ -163,8 +139,8 @@ public class ColdVyaapariController {
 		listVyaapariName.setCellValueFactory(new PropertyValueFactory<Vyaapari, String>("vyaapariName"));
 		listVyaapariPhone.setCellValueFactory(new PropertyValueFactory<Vyaapari, String>("phoneNo"));
 		listVyaapariAddress.setCellValueFactory(new PropertyValueFactory<Vyaapari, String>("address"));
-		if (!vyaapariList.isEmpty())
-			vyaapariListView.setItems(FXCollections.observableList(vyaapariList));
+		if (!jsonUtils.getVyaapariList().isEmpty())
+			vyaapariListView.setItems(FXCollections.observableList(jsonUtils.getVyaapariList()));
 	}
 
 	@FXML
@@ -173,7 +149,7 @@ public class ColdVyaapariController {
 			makeColdStoreList();
 			ColdStorage cold = makeColdStorage(new ColdStorage());
 			writeColdObjectToJson(cold);
-			successMessage.setText("Cold added successfully. Cold Id : " + cold.getColdId());
+			successMessage.setText("Cold added successfully.");
 			makeColdStoreList();
 			clearUI();
 		} catch (Exception e) {
@@ -183,20 +159,11 @@ public class ColdVyaapariController {
 
 	private void writeColdObjectToJson(ColdStorage cold) {
 		Integer maxKey = 0;
-		if (!coldStoreMap.isEmpty())
-			maxKey = Collections.max(coldStoreMap.keySet());
+		if (!jsonUtils.getColdStoreMap().isEmpty())
+			maxKey = Collections.max(jsonUtils.getColdStoreMap().keySet());
 		cold.setColdId(maxKey + 1);
-		coldStoreMap.put(cold.getColdId(), cold);
-		jsonWriter.writeObjectToJson("ColdStorage", coldStoreMap);
-	}
-
-	private void clearUI() {
-		coldName.setText("");
-		coldAdd.setText("");
-		coldPhone.setText("");
-		vyaapariName.setText("");
-		vyaapariAddress.setText("");
-		vyaapariNumber.setText("");
+		jsonUtils.setColdStoreMap(cold);
+		jsonUtils.writeObjectToJson("ColdStorage", jsonUtils.getColdStoreMap());
 	}
 
 	private ColdStorage makeColdStorage(ColdStorage cold) {
@@ -213,7 +180,7 @@ public class ColdVyaapariController {
 			makeVyaapariList();
 			Vyaapari vyaapari = makeVyaapari(new Vyaapari());
 			writeVyaapariObjectToJson(vyaapari);
-			successMessage1.setText("Vyaapari added successfully. Vyaapari ID : " + vyaapari.getVyaapariId());
+			successMessage1.setText("Vyaapari added successfully.");
 			makeVyaapariList();
 			clearUI();
 		} catch (Exception e) {
@@ -223,11 +190,11 @@ public class ColdVyaapariController {
 
 	private void writeVyaapariObjectToJson(Vyaapari vyaapari) {
 		Integer maxKey = 0;
-		if (!vyaapariMap.isEmpty())
-			maxKey = Collections.max(vyaapariMap.keySet());
+		if (!jsonUtils.getVyaapariMap().isEmpty())
+			maxKey = Collections.max(jsonUtils.getVyaapariMap().keySet());
 		vyaapari.setVyaapariId(maxKey + 1);
-		vyaapariMap.put(vyaapari.getVyaapariId(), vyaapari);
-		jsonWriter.writeObjectToJson("Vyaapari", vyaapariMap);
+		jsonUtils.setVyaapariMap(vyaapari);
+		jsonUtils.writeObjectToJson("Vyaapari", jsonUtils.getVyaapariMap());
 	}
 
 	private Vyaapari makeVyaapari(Vyaapari vyaapari) {
@@ -236,6 +203,15 @@ public class ColdVyaapariController {
 		vyaapari.setDate(DateUtils.makeDate(vyaapariDate));
 		vyaapari.setVyaapariName(vyaapariName.getText());
 		return vyaapari;
+	}
+
+	private void clearUI() {
+		coldName.setText("");
+		coldAdd.setText("");
+		coldPhone.setText("");
+		vyaapariName.setText("");
+		vyaapariAddress.setText("");
+		vyaapariNumber.setText("");
 	}
 
 }

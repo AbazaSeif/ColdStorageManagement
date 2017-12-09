@@ -1,4 +1,4 @@
-package com.mg.controller;
+package com.mg.initialize.controller;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -40,12 +40,11 @@ public class LoginController {
 	private Text successMessage;
 
 	@FXML
-	public void initialize(){
-		btnLogin.setOnKeyPressed(e ->{
-			if(e.getCode().equals(KeyCode.ENTER))
+	public void initialize() {
+		btnLogin.setOnKeyPressed(e -> {
+			if (e.getCode().equals(KeyCode.ENTER))
 				btnLogin();
 		});
-
 	}
 
 	@FXML

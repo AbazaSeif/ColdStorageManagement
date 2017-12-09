@@ -1,21 +1,16 @@
 package com.mg.controller;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.apache.log4j.Logger;
 
 import com.mg.csms.beans.Demand;
-import com.mg.csms.beans.InwardStock;
 import com.mg.csms.beans.InwardStockItem;
-import com.mg.jsonhandler.JSONParser;
-import com.mg.jsonhandler.JSONWriter;
 import com.mg.utils.DateUtils;
+import com.mg.utils.JsonUtils;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -54,15 +49,12 @@ public class DemandController {
 	private Button addDemandToListButton;
 	@FXML
 	private Button submitDemandButton;
-
-	private JSONWriter jsonWriter;
-	private JSONParser jsonParser;
+	private JsonUtils jsonUtils;
 
 	@FXML
 	private void initialize() {
 		try {
-			jsonWriter = new JSONWriter();
-			jsonParser = new JSONParser();
+			jsonUtils = JsonUtils.getInstance();
 		} catch (Exception e) {
 			successMessage.setText("Database errors occoured");
 		}
@@ -142,41 +134,17 @@ public class DemandController {
 
 	private void writeDemandToJson(Demand demand) {
 		Integer maxKey = 0;
-		Map<Integer, Object> demandMap = new HashMap<>();
-		try {
-			demandMap = jsonParser.getObjectFromJsonFile("Demand");
-			if (!demandMap.isEmpty())
-				maxKey = Collections.max(demandMap.keySet());
-		} catch (IOException ex) {
-			log.error(ex.getMessage());
-		}
+		jsonUtils.makeDemandList();
+		if (!jsonUtils.getDemandMap().isEmpty())
+			maxKey = Collections.max(jsonUtils.getDemandMap().keySet());
 		demand.setDemandId(maxKey + 1);
-		demandMap.put(demand.getDemandId(), demand);
-		jsonWriter.writeObjectToJson("Demand", demandMap);
-	}
-
-	private ArrayList<InwardStock> getStockList() {
-		Map<Integer, Object> stockList = new HashMap<>();
-		try {
-			stockList = jsonParser.getObjectFromJsonFile("InwardStock");
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-		return new ArrayList(stockList.values());
-	}
-
-	private List<InwardStockItem> getStockItemList() {
-		Map<Integer, Object> stockItemList = new HashMap<>();
-		try {
-			stockItemList = jsonParser.getObjectFromJsonFile("InwardStockItem");
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
-		return new ArrayList(stockItemList.values());
+		jsonUtils.getDemandMap().put(demand.getDemandId(), demand);
+		jsonUtils.writeObjectToJson("Demand", jsonUtils.getDemandMap());
 	}
 
 	private boolean updateStockItemListBalance(Demand demandItem) {
-		Optional<InwardStockItem> item = getStockItemList().stream()
+		jsonUtils.makeStockItemList();
+		Optional<InwardStockItem> item = jsonUtils.getStockItemList().stream()
 				.filter(ele -> ele.getColdNo().toString().equalsIgnoreCase(demandItem.getColdNo().toString()))
 				.findFirst();
 		Boolean flag = false;
@@ -215,14 +183,9 @@ public class DemandController {
 									+ item.get().getColdNo() + ". Available: " + item.get().getBalance());
 			else {
 				item.get().setBalance(balance);
-				Map<Integer, Object> stockItemMap = new HashMap<>();
-				try {
-					stockItemMap = jsonParser.getObjectFromJsonFile("InwardStockItem");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				stockItemMap.put(item.get().getRecordId(), item.get());
-				jsonWriter.writeObjectToJson("InwardStockItem", stockItemMap);
+				jsonUtils.makeStockItemList();
+				jsonUtils.setStockItemMap(item.get());
+				jsonUtils.writeObjectToJson("InwardStockItem", jsonUtils.getStockItemMap());
 				return true;
 			}
 			return false;
@@ -231,7 +194,8 @@ public class DemandController {
 	}
 
 	private boolean isValidColdNo(Integer coldNo) {
-		return getStockItemList().stream().anyMatch(item -> item.getColdNo().equals(coldNo));
+		jsonUtils.makeStockItemList();
+		return jsonUtils.getStockItemList().stream().anyMatch(item -> item.getColdNo().equals(coldNo));
 	}
 
 	private void clearOverallUI() {

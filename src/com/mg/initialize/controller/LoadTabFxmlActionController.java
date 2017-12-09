@@ -1,4 +1,4 @@
-package com.mg.controller;
+package com.mg.initialize.controller;
 
 import java.io.IOException;
 
