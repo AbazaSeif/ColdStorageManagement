@@ -11,8 +11,12 @@ import org.apache.log4j.Logger;
 
 import com.mg.csms.beans.InwardStock;
 import com.mg.csms.beans.InwardStockItem;
+import com.mg.json.controller.JsonHandlerInterface;
+import com.mg.json.model.ColdStorageJsonModel;
+import com.mg.json.model.InwardStockItemJsonModel;
+import com.mg.json.model.InwardStockJsonModel;
+import com.mg.json.model.VyaapariJsonModel;
 import com.mg.utils.DateUtils;
-import com.mg.utils.JsonUtils;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -79,12 +83,18 @@ public class InwardStockController {
 	@FXML
 	private Text successMessage;
 
-	private JsonUtils jsonUtils;
+	private JsonHandlerInterface jsonStockModel;
+	private JsonHandlerInterface jsonStockItemModel;
+	private JsonHandlerInterface jsonColdHandler;
+	private JsonHandlerInterface jsonVyaapariHandler;
 
 	@FXML
 	protected void initialize() {
 		try {
-			jsonUtils = JsonUtils.getInstance();
+			jsonStockModel = new InwardStockJsonModel();
+			jsonStockItemModel = new InwardStockItemJsonModel();
+			jsonColdHandler = new ColdStorageJsonModel();
+			jsonVyaapariHandler = new VyaapariJsonModel();
 		} catch (Exception e) {
 			successMessage.setText("Database errors occoured");
 		}
@@ -143,7 +153,8 @@ public class InwardStockController {
 		inwardStockItem.setColdNo(Integer.parseInt(coldNo.getText()));
 		inwardStockItem.setItem(itemList.getValue());
 		inwardStockItem.setQuantity(Integer.parseInt(quantity.getText()));
-		inwardStockItem.setRate(Float.parseFloat(rate.getText()));
+		if (!rate.getText().isEmpty())
+			inwardStockItem.setRate(Float.parseFloat(rate.getText()));
 		return inwardStockItem;
 	}
 
@@ -169,13 +180,12 @@ public class InwardStockController {
 
 	private void writeInwardStockToJson(InwardStock stock) {
 		Integer maxKey = 0;
-		jsonUtils.makeStockList();
-		if (!jsonUtils.getStockMap().isEmpty())
-			maxKey = Collections.max(jsonUtils.getStockMap().keySet());
+		jsonStockModel.makeListAndMapFromJson();
+		if (!((InwardStockJsonModel) jsonStockModel).getStockMap().isEmpty())
+			maxKey = Collections.max(((InwardStockJsonModel) jsonStockModel).getStockMap().keySet());
 		stock.setStockId(maxKey + 1);
-		jsonUtils.setStockMap(stock);
-		jsonUtils.setStockMap(stock);
-		jsonUtils.writeObjectToJson("InwardStock", jsonUtils.getStockMap());
+		((InwardStockJsonModel) jsonStockModel).setStockMap(stock);
+		jsonStockModel.writeObjectToJson("InwardStock", ((InwardStockJsonModel) jsonStockModel).getStockMap());
 	}
 
 	private void makeInwardStockItemsAndSave(InwardStock stock) {
@@ -196,12 +206,13 @@ public class InwardStockController {
 
 	private void writeItemToJson(InwardStockItem item) {
 		Integer maxKey = 0;
-		jsonUtils.makeStockItemList();
-		if (!jsonUtils.getStockItemMap().isEmpty())
-			maxKey = Collections.max(jsonUtils.getStockItemMap().keySet());
+		jsonStockItemModel.makeListAndMapFromJson();
+		if (!((InwardStockItemJsonModel) jsonStockItemModel).getStockItemMap().isEmpty())
+			maxKey = Collections.max(((InwardStockItemJsonModel) jsonStockItemModel).getStockItemMap().keySet());
 		item.setRecordId(maxKey + 1);
-		jsonUtils.setStockItemMap(item);
-		jsonUtils.writeObjectToJson("InwardStockItem", jsonUtils.getStockItemMap());
+		((InwardStockItemJsonModel) jsonStockItemModel).setStockItemMap(item);
+		jsonStockItemModel.writeObjectToJson("InwardStockItem",
+				((InwardStockItemJsonModel) jsonStockItemModel).getStockItemMap());
 	}
 
 	private InwardStock makeInwardStock(InwardStock inwardStock) {
@@ -227,17 +238,17 @@ public class InwardStockController {
 	}
 
 	private ObservableList<String> getColdStoreList() {
-		jsonUtils.makeColdStoreList();
+		jsonColdHandler.makeListAndMapFromJson();
 		List<String> coldStoreNameList = new ArrayList<>();
-		jsonUtils.getColdStoreList()
+		((ColdStorageJsonModel) jsonColdHandler).getColdStoreList()
 				.forEach(cold -> coldStoreNameList.add(cold.getColdId() + ": " + cold.getColdName()));
 		return FXCollections.observableList(coldStoreNameList);
 	}
 
 	private ObservableList<String> getVyaapariList() {
 		List<String> vyaapariNameList = new ArrayList<>();
-		jsonUtils.makeVyaapariList();
-		jsonUtils.getVyaapariList().forEach(
+		jsonVyaapariHandler.makeListAndMapFromJson();
+		((VyaapariJsonModel) jsonVyaapariHandler).getVyaapariList().forEach(
 				vyaapari -> vyaapariNameList.add(vyaapari.getVyaapariId() + ": " + vyaapari.getVyaapariName()));
 		return FXCollections.observableList(vyaapariNameList);
 	}

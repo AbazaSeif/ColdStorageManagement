@@ -9,8 +9,10 @@ import org.apache.log4j.Logger;
 
 import com.mg.csms.beans.Demand;
 import com.mg.csms.beans.InwardStockItem;
+import com.mg.json.controller.JsonHandlerInterface;
+import com.mg.json.model.DemandJsonModel;
+import com.mg.json.model.InwardStockItemJsonModel;
 import com.mg.utils.DateUtils;
-import com.mg.utils.JsonUtils;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -36,11 +38,15 @@ public class DemandController {
 	@FXML
 	private TextField quantity;
 	@FXML
+	private TextField chalanNumber;
+	@FXML
 	private TableView<Demand> itemListTable;
 	@FXML
 	private TableColumn<Demand, String> tableColdNo;
 	@FXML
 	private TableColumn<Demand, String> tableQuantity;
+	@FXML
+	private TableColumn<Demand, String> tableChalanNumber;
 	@FXML
 	private Text successMessage;
 	List<Demand> addItemList;
@@ -49,12 +55,15 @@ public class DemandController {
 	private Button addDemandToListButton;
 	@FXML
 	private Button submitDemandButton;
-	private JsonUtils jsonUtils;
+
+	private JsonHandlerInterface jsonDemandModel;
+	private JsonHandlerInterface jsonStockItemModel;
 
 	@FXML
 	private void initialize() {
 		try {
-			jsonUtils = JsonUtils.getInstance();
+			jsonDemandModel = new DemandJsonModel();
+			jsonStockItemModel = new InwardStockItemJsonModel();
 		} catch (Exception e) {
 			successMessage.setText("Database errors occoured");
 		}
@@ -64,6 +73,7 @@ public class DemandController {
 		itemListTable.setEditable(true);
 		tableColdNo.setCellValueFactory(new PropertyValueFactory<Demand, String>("coldNo"));
 		tableQuantity.setCellValueFactory(new PropertyValueFactory<Demand, String>("quantity"));
+		tableChalanNumber.setCellValueFactory(new PropertyValueFactory<Demand, String>("chalanNumber"));
 		initializeButtonKeyActions();
 	}
 
@@ -93,12 +103,15 @@ public class DemandController {
 		Demand demand = new Demand();
 		demand.setQuantity(Integer.parseInt(quantity.getText()));
 		demand.setColdNo(Integer.parseInt(coldNo.getText()));
+		if (!chalanNumber.getText().isEmpty())
+			demand.setChalanNumber(Integer.parseInt(chalanNumber.getText()));
 		return demand;
 	}
 
 	private void clearUI() {
 		coldNo.clear();
 		quantity.clear();
+		chalanNumber.clear();
 	}
 
 	@FXML
@@ -122,6 +135,8 @@ public class DemandController {
 				demand.setColdNo(demandItem.getColdNo());
 				demand.setDemandDate(DateUtils.makeDate(demandDate));
 				demand.setQuantity(demandItem.getQuantity());
+				if (demandItem.getChalanNumber() != null)
+					demand.setChalanNumber(demandItem.getChalanNumber());
 				if (updateStockItemListBalance(demandItem))
 					writeDemandToJson(demand);
 				else
@@ -134,17 +149,17 @@ public class DemandController {
 
 	private void writeDemandToJson(Demand demand) {
 		Integer maxKey = 0;
-		jsonUtils.makeDemandList();
-		if (!jsonUtils.getDemandMap().isEmpty())
-			maxKey = Collections.max(jsonUtils.getDemandMap().keySet());
+		jsonDemandModel.makeListAndMapFromJson();
+		if (!((DemandJsonModel) jsonDemandModel).getDemandMap().isEmpty())
+			maxKey = Collections.max(((DemandJsonModel) jsonDemandModel).getDemandMap().keySet());
 		demand.setDemandId(maxKey + 1);
-		jsonUtils.getDemandMap().put(demand.getDemandId(), demand);
-		jsonUtils.writeObjectToJson("Demand", jsonUtils.getDemandMap());
+		((DemandJsonModel) jsonDemandModel).getDemandMap().put(demand.getDemandId(), demand);
+		jsonDemandModel.writeObjectToJson("Demand", ((DemandJsonModel) jsonDemandModel).getDemandMap());
 	}
 
 	private boolean updateStockItemListBalance(Demand demandItem) {
-		jsonUtils.makeStockItemList();
-		Optional<InwardStockItem> item = jsonUtils.getStockItemList().stream()
+		jsonStockItemModel.makeListAndMapFromJson();
+		Optional<InwardStockItem> item = ((InwardStockItemJsonModel) jsonStockItemModel).getStockItemList().stream()
 				.filter(ele -> ele.getColdNo().toString().equalsIgnoreCase(demandItem.getColdNo().toString()))
 				.findFirst();
 		Boolean flag = false;
@@ -183,9 +198,10 @@ public class DemandController {
 									+ item.get().getColdNo() + ". Available: " + item.get().getBalance());
 			else {
 				item.get().setBalance(balance);
-				jsonUtils.makeStockItemList();
-				jsonUtils.setStockItemMap(item.get());
-				jsonUtils.writeObjectToJson("InwardStockItem", jsonUtils.getStockItemMap());
+				jsonStockItemModel.makeListAndMapFromJson();
+				((InwardStockItemJsonModel) jsonStockItemModel).setStockItemMap(item.get());
+				jsonStockItemModel.writeObjectToJson("InwardStockItem",
+						((InwardStockItemJsonModel) jsonStockItemModel).getStockItemMap());
 				return true;
 			}
 			return false;
@@ -194,8 +210,9 @@ public class DemandController {
 	}
 
 	private boolean isValidColdNo(Integer coldNo) {
-		jsonUtils.makeStockItemList();
-		return jsonUtils.getStockItemList().stream().anyMatch(item -> item.getColdNo().equals(coldNo));
+		jsonStockItemModel.makeListAndMapFromJson();
+		return ((InwardStockItemJsonModel) jsonStockItemModel).getStockItemList().stream()
+				.anyMatch(item -> item.getColdNo().equals(coldNo));
 	}
 
 	private void clearOverallUI() {

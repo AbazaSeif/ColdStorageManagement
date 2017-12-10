@@ -14,6 +14,7 @@ public class Demand {
 	private Integer demandId;
 	private Integer quantity;
 	private Integer coldNo;
+	private Integer chalanNumber;
 
 	public LocalDate getDemandDate() {
 		return demandDate;
@@ -45,6 +46,14 @@ public class Demand {
 
 	public void setColdNo(Integer coldNo) {
 		this.coldNo = coldNo;
+	}
+
+	public Integer getChalanNumber() {
+		return chalanNumber;
+	}
+
+	public void setChalanNumber(Integer chalanNumber) {
+		this.chalanNumber = chalanNumber;
 	}
 
 }

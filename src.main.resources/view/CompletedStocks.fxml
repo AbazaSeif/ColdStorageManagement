@@ -40,12 +40,13 @@
           </items>
         </ChoiceBox>
         <Label layoutX="42.0" layoutY="52.0" text="Gadi No" />
-        <TableView id="" fx:id="demandListTable" disable="false" editable="false" layoutX="229.0" layoutY="283.0" prefHeight="196.0" prefWidth="419.0">
-          <columns>
-            <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="204.0" text="Date" fx:id="demandTableDate" />
-            <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="213.0" text="Quantity" fx:id="demandTableQuantity" />
-          </columns>
-        </TableView>
+        <TableView id="" fx:id="demandListTable" disable="false" editable="false" layoutX="218.0" layoutY="290.0" prefHeight="196.0" prefWidth="441.0">
+      <columns>
+        <TableColumn fx:id="demandTableDate" maxWidth="5000.0" minWidth="10.0" prefWidth="136.0" text="Date" />
+        <TableColumn fx:id="demandTableQuantity" maxWidth="5000.0" minWidth="10.0" prefWidth="129.0" text="Quantity" />
+        <TableColumn fx:id="demandTableChalanNumber" maxWidth="5000.0" minWidth="10.0" prefWidth="174.0" text="ChalanNumber" />
+      </columns>
+    </TableView>
       </children>
     </AnchorPane>
   </children>

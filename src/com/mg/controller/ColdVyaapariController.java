@@ -6,8 +6,10 @@ import org.apache.log4j.Logger;
 
 import com.mg.csms.beans.ColdStorage;
 import com.mg.csms.beans.Vyaapari;
+import com.mg.json.controller.JsonHandlerInterface;
+import com.mg.json.model.ColdStorageJsonModel;
+import com.mg.json.model.VyaapariJsonModel;
 import com.mg.utils.DateUtils;
-import com.mg.utils.JsonUtils;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -26,7 +28,7 @@ import javafx.scene.text.Text;
  *
  */
 public class ColdVyaapariController {
-	private static Logger log = Logger.getLogger(InwardStockController.class);
+	private static Logger log = Logger.getLogger(ColdVyaapariController.class);
 
 	@FXML
 	private DatePicker coldDate;
@@ -82,16 +84,18 @@ public class ColdVyaapariController {
 	@FXML
 	private Text successMessage1;
 
-	private JsonUtils jsonUtils;
+	private JsonHandlerInterface jsonColdHandler;
+	private JsonHandlerInterface jsonVyaapariHandler;
 
 	@FXML
 	protected void initialize() {
 		try {
-			jsonUtils = JsonUtils.getInstance();
+			jsonColdHandler = new ColdStorageJsonModel();
+			jsonVyaapariHandler = new VyaapariJsonModel();
 		} catch (Exception e) {
 			successMessage.setText("Error in File Handling.");
+			log.error(e.getMessage());
 		}
-
 		initializeDate();
 		makeColdStoreList();
 		makeVyaapariList();
@@ -104,12 +108,12 @@ public class ColdVyaapariController {
 	}
 
 	private void makeColdStoreList() {
-		jsonUtils.makeColdStoreList();
+		jsonColdHandler.makeListAndMapFromJson();
 		initializeColdTable();
 	}
 
 	private void makeVyaapariList() {
-		jsonUtils.makeVyaapariList();
+		jsonVyaapariHandler.makeListAndMapFromJson();
 		initializeVyaapariTable();
 	}
 
@@ -130,8 +134,9 @@ public class ColdVyaapariController {
 		listColdName.setCellValueFactory(new PropertyValueFactory<ColdStorage, String>("coldName"));
 		listColdPhone.setCellValueFactory(new PropertyValueFactory<ColdStorage, String>("phoneNo"));
 		listColdAddress.setCellValueFactory(new PropertyValueFactory<ColdStorage, String>("address"));
-		if (!jsonUtils.getColdStoreList().isEmpty())
-			coldListView.setItems(FXCollections.observableList(jsonUtils.getColdStoreList()));
+		if (!((ColdStorageJsonModel) jsonColdHandler).getColdStoreList().isEmpty())
+			coldListView.setItems(
+					FXCollections.observableList(((ColdStorageJsonModel) jsonColdHandler).getColdStoreList()));
 	}
 
 	private void initializeVyaapariTable() {
@@ -139,8 +144,9 @@ public class ColdVyaapariController {
 		listVyaapariName.setCellValueFactory(new PropertyValueFactory<Vyaapari, String>("vyaapariName"));
 		listVyaapariPhone.setCellValueFactory(new PropertyValueFactory<Vyaapari, String>("phoneNo"));
 		listVyaapariAddress.setCellValueFactory(new PropertyValueFactory<Vyaapari, String>("address"));
-		if (!jsonUtils.getVyaapariList().isEmpty())
-			vyaapariListView.setItems(FXCollections.observableList(jsonUtils.getVyaapariList()));
+		if (!((VyaapariJsonModel) jsonVyaapariHandler).getVyaapariList().isEmpty())
+			vyaapariListView.setItems(
+					FXCollections.observableList(((VyaapariJsonModel) jsonVyaapariHandler).getVyaapariList()));
 	}
 
 	@FXML
@@ -159,11 +165,11 @@ public class ColdVyaapariController {
 
 	private void writeColdObjectToJson(ColdStorage cold) {
 		Integer maxKey = 0;
-		if (!jsonUtils.getColdStoreMap().isEmpty())
-			maxKey = Collections.max(jsonUtils.getColdStoreMap().keySet());
+		if (!((ColdStorageJsonModel) jsonColdHandler).getColdStoreMap().isEmpty())
+			maxKey = Collections.max(((ColdStorageJsonModel) jsonColdHandler).getColdStoreMap().keySet());
 		cold.setColdId(maxKey + 1);
-		jsonUtils.setColdStoreMap(cold);
-		jsonUtils.writeObjectToJson("ColdStorage", jsonUtils.getColdStoreMap());
+		((ColdStorageJsonModel) jsonColdHandler).setColdStoreMap(cold);
+		jsonColdHandler.writeObjectToJson("ColdStorage", ((ColdStorageJsonModel) jsonColdHandler).getColdStoreMap());
 	}
 
 	private ColdStorage makeColdStorage(ColdStorage cold) {
@@ -190,11 +196,11 @@ public class ColdVyaapariController {
 
 	private void writeVyaapariObjectToJson(Vyaapari vyaapari) {
 		Integer maxKey = 0;
-		if (!jsonUtils.getVyaapariMap().isEmpty())
-			maxKey = Collections.max(jsonUtils.getVyaapariMap().keySet());
+		if (!((VyaapariJsonModel) jsonVyaapariHandler).getVyaapariMap().isEmpty())
+			maxKey = Collections.max(((VyaapariJsonModel) jsonVyaapariHandler).getVyaapariMap().keySet());
 		vyaapari.setVyaapariId(maxKey + 1);
-		jsonUtils.setVyaapariMap(vyaapari);
-		jsonUtils.writeObjectToJson("Vyaapari", jsonUtils.getVyaapariMap());
+		((VyaapariJsonModel) jsonVyaapariHandler).setVyaapariMap(vyaapari);
+		jsonVyaapariHandler.writeObjectToJson("Vyaapari", ((VyaapariJsonModel) jsonVyaapariHandler).getVyaapariMap());
 	}
 
 	private Vyaapari makeVyaapari(Vyaapari vyaapari) {
