@@ -1,21 +1,22 @@
 package com.mg.controller;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import com.mg.csms.beans.InwardStock;
 import com.mg.csms.beans.InwardStockItem;
+import com.mg.csms.beans.Item;
 import com.mg.json.controller.JsonHandlerInterface;
 import com.mg.json.model.ColdStorageJsonModel;
 import com.mg.json.model.InwardStockItemJsonModel;
 import com.mg.json.model.InwardStockJsonModel;
 import com.mg.json.model.VyaapariJsonModel;
+import com.mg.jsonhandler.JSONParser;
 import com.mg.utils.DateUtils;
 
 import javafx.collections.FXCollections;
@@ -241,7 +242,7 @@ public class InwardStockController {
 		jsonColdHandler.makeListAndMapFromJson();
 		List<String> coldStoreNameList = new ArrayList<>();
 		((ColdStorageJsonModel) jsonColdHandler).getColdStoreList()
-				.forEach(cold -> coldStoreNameList.add(cold.getColdId() + ": " + cold.getColdName()));
+		.forEach(cold -> coldStoreNameList.add(cold.getColdId() + ": " + cold.getColdName()));
 		return FXCollections.observableList(coldStoreNameList);
 	}
 
@@ -255,10 +256,9 @@ public class InwardStockController {
 
 	private ObservableList<String> makeItemsList() {
 		List<String> itemsList = new ArrayList<>();
-		try (FileReader reader = new FileReader("./resources/itemList.properties")) {
-			Properties p = new Properties();
-			p.load(reader);
-			p.entrySet().forEach(e -> itemsList.add((String) e.getValue()));
+		try{
+			Map<Integer, Object> itemMap = new JSONParser().getObjectFromJsonFile("ItemList");
+			itemMap.entrySet().forEach(item -> itemsList.add(((Item)item.getValue()).getItemName()));
 			Collections.sort(itemsList);
 		} catch (IOException e) {
 			log.debug(e.getMessage());

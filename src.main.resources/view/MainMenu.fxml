@@ -39,6 +39,11 @@
             <fx:include fx:id="billing" source="Billing.fxml" />
           </content>
         </Tab>
+        <Tab fx:id="addItemTab" closable="false" text="Add Item">
+          <content>
+            <fx:include fx:id="addItem" source="AddItem.fxml" />
+          </content>
+        </Tab>
       </tabs>
     </TabPane>
   </children>

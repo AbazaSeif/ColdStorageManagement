@@ -13,6 +13,7 @@ import com.mg.csms.beans.ColdStorage;
 import com.mg.csms.beans.Demand;
 import com.mg.csms.beans.InwardStock;
 import com.mg.csms.beans.InwardStockItem;
+import com.mg.csms.beans.Item;
 import com.mg.csms.beans.Vyaapari;
 import com.mg.stock.constant.StockConstants;
 
@@ -49,6 +50,10 @@ public class JSONParser {
 					break;
 				case "Demand":
 					objectMap = mapper.readValue(file, new TypeReference<Map<Integer, Demand>>() {
+					});
+					break;
+				case "ItemList":
+					objectMap = mapper.readValue(file, new TypeReference<Map<Integer, Item>>() {
 					});
 					break;
 				default:
