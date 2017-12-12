@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import com.mg.csms.beans.Demand;
 import com.mg.csms.beans.InwardStockItem;
 import com.mg.json.controller.JsonHandlerInterface;
+import com.mg.json.model.BillingJsonModel;
 import com.mg.json.model.DemandJsonModel;
 import com.mg.json.model.InwardStockItemJsonModel;
 import com.mg.utils.DateUtils;
@@ -26,6 +27,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 
+/**
+ * @author Mohak Gupta
+ *
+ */
 public class DemandController {
 	private static final String MESSAGE_SEPERATOR = " AND ";
 
@@ -58,12 +63,14 @@ public class DemandController {
 
 	private JsonHandlerInterface jsonDemandModel;
 	private JsonHandlerInterface jsonStockItemModel;
+	private JsonHandlerInterface jsonBillingModel;
 
 	@FXML
 	private void initialize() {
 		try {
 			jsonDemandModel = new DemandJsonModel();
 			jsonStockItemModel = new InwardStockItemJsonModel();
+			jsonBillingModel = new BillingJsonModel();
 		} catch (Exception e) {
 			successMessage.setText("Database errors occoured");
 		}
@@ -153,7 +160,7 @@ public class DemandController {
 		if (!((DemandJsonModel) jsonDemandModel).getDemandMap().isEmpty())
 			maxKey = Collections.max(((DemandJsonModel) jsonDemandModel).getDemandMap().keySet());
 		demand.setDemandId(maxKey + 1);
-		((DemandJsonModel) jsonDemandModel).getDemandMap().put(demand.getDemandId(), demand);
+		((DemandJsonModel) jsonDemandModel).setDemandMap(demand);
 		jsonDemandModel.writeObjectToJson("Demand", ((DemandJsonModel) jsonDemandModel).getDemandMap());
 	}
 
@@ -202,11 +209,20 @@ public class DemandController {
 				((InwardStockItemJsonModel) jsonStockItemModel).setStockItemMap(item.get());
 				jsonStockItemModel.writeObjectToJson("InwardStockItem",
 						((InwardStockItemJsonModel) jsonStockItemModel).getStockItemMap());
+				if (balance == 0)
+					makeEntryInBillingFile(item.get());
 				return true;
 			}
 			return false;
 		}
 		return false;
+	}
+
+	private void makeEntryInBillingFile(InwardStockItem inwardStockItem) {
+		jsonBillingModel.makeListAndMapFromJson();
+		((BillingJsonModel) jsonBillingModel).setBillingMap(((BillingJsonModel) jsonBillingModel)
+				.makeBillingDetailsObjectFromInwardStockItemObject(inwardStockItem));
+		jsonBillingModel.writeObjectToJson("Billing", ((BillingJsonModel) jsonBillingModel).getBillingMap());
 	}
 
 	private boolean isValidColdNo(Integer coldNo) {

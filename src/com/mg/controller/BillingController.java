@@ -1,19 +1,20 @@
 package com.mg.controller;
 
 import java.sql.Date;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.mg.csms.beans.BillingDetails;
 import com.mg.csms.beans.ColdStorage;
 import com.mg.csms.beans.Demand;
 import com.mg.csms.beans.InwardStock;
-import com.mg.csms.beans.InwardStockItem;
 import com.mg.json.controller.JsonHandlerInterface;
+import com.mg.json.model.BillingJsonModel;
 import com.mg.json.model.ColdStorageJsonModel;
 import com.mg.json.model.DemandJsonModel;
-import com.mg.json.model.InwardStockItemJsonModel;
 import com.mg.json.model.InwardStockJsonModel;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -27,24 +28,28 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 
+/**
+ * @author Mohak Gupta
+ *
+ */
 public class BillingController {
 
 	@FXML
-	private TableView<InwardStockItem> stockListView;
+	private TableView<BillingDetails> stockListView;
 	@FXML
-	private TableColumn<InwardStockItem, String> itemColdNo;
+	private TableColumn<BillingDetails, String> itemColdNo;
 	@FXML
-	private TableColumn<InwardStockItem, String> itemQuantity;
+	private TableColumn<BillingDetails, String> itemQuantity;
 	@FXML
-	private TableColumn<InwardStockItem, Date> entryDate;
+	private TableColumn<BillingDetails, Date> entryDate;
 	@FXML
-	private TableColumn<InwardStockItem, String> itemLotNo;
+	private TableColumn<BillingDetails, String> itemLotNo;
 	@FXML
-	private TableColumn<InwardStockItem, String> itemColdStore;
+	private TableColumn<BillingDetails, String> itemColdStore;
 	@FXML
-	private TableColumn<InwardStockItem, String> itemBhada;
+	private TableColumn<BillingDetails, String> itemBhada;
 	@FXML
-	private TableColumn<InwardStockItem, String> itemBillAmount;
+	private TableColumn<BillingDetails, String> itemBillAmount;
 
 	@FXML
 	private TableView<Demand> demandListTable;
@@ -66,49 +71,40 @@ public class BillingController {
 	private Text successMessage;
 
 	private JsonHandlerInterface jsonStockModel;
-	private JsonHandlerInterface jsonStockItemModel;
 	private JsonHandlerInterface jsonColdHandler;
 	private JsonHandlerInterface jsonDemandHandler;
-	private List<InwardStockItem> stockItemList1;
-	private List<InwardStockItem> stockListUpdated;
+	private List<BillingDetails> billingItemList;
 	private List<Demand> demandListToShow;
+	private JsonHandlerInterface jsonBillingModel;
 
 	@FXML
-	public void initialize(){
-		jsonStockModel = new InwardStockJsonModel();
-		jsonStockItemModel = new InwardStockItemJsonModel();
-		jsonColdHandler = new ColdStorageJsonModel();
-		jsonDemandHandler = new DemandJsonModel();
-		demandListToShow = new ArrayList<>();
-		stockItemList1 = new ArrayList<>();
-		stockListUpdated = new ArrayList<>();
+	public void initialize() {
+		initializeObjects();
 		initializeTableViews();
 		addTableRowAction();
-
-		jsonStockItemModel.makeListAndMapFromJson();
-		stockItemList1 = ((InwardStockItemJsonModel) jsonStockItemModel).getStockItemList();
-		stockListUpdated.addAll(stockItemList1.stream().filter(element -> filterStockItemCondition(element))
-				.collect(Collectors.toList()));
-		stockListView.setItems(FXCollections.observableList(stockListUpdated));
+		populateBillingListView();
 	}
 
-	protected boolean filterStockItemCondition(InwardStockItem element) {
-		return element.getBalance() == 0;
-	}
-
-	@FXML
-	private void billPaidAction(){
-		successMessage.setText("Bill Paid. Please check Paid Entries Tab for Paid Bills.");
-	}
-
-	@FXML
-	private void calculateBill(){
-		successMessage.setText("Bill Generated. Please check respective entry for bill amount.");
+	private void initializeObjects() {
+		demandListToShow = new ArrayList<>();
+		billingItemList = new ArrayList<>();
+		jsonStockModel = new InwardStockJsonModel();
+		jsonBillingModel = new BillingJsonModel();
+		jsonColdHandler = new ColdStorageJsonModel();
+		jsonDemandHandler = new DemandJsonModel();
 	}
 
 	private void initializeTableViews() {
-		initializeStockListTableView();
+		initializeBillingTableView();
 		initializeDemandListTableView();
+	}
+
+	private void populateBillingListView() {
+		jsonBillingModel.makeListAndMapFromJson();
+		billingItemList = ((BillingJsonModel) jsonBillingModel).getBillingList();
+		if (!billingItemList.isEmpty())
+			billingItemList.removeIf(item -> item.getIsPaid());
+		stockListView.setItems(FXCollections.observableList(billingItemList));
 	}
 
 	private void addTableRowAction() {
@@ -126,14 +122,14 @@ public class BillingController {
 		demandListTable.setItems(FXCollections.observableList(demandListToShow));
 	}
 
-	private void initializeStockListTableView() {
+	private void initializeBillingTableView() {
 		stockListView.setEditable(true);
-		entryDate.setCellValueFactory(new PropertyValueFactory<InwardStockItem, Date>("entryDate"));
-		itemColdNo.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("coldNo"));
-		itemQuantity.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("quantity"));
-		itemLotNo.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("lotNo"));
+		entryDate.setCellValueFactory(new PropertyValueFactory<BillingDetails, Date>("entryDate"));
+		itemColdNo.setCellValueFactory(new PropertyValueFactory<BillingDetails, String>("coldNo"));
+		itemQuantity.setCellValueFactory(new PropertyValueFactory<BillingDetails, String>("quantity"));
+		itemLotNo.setCellValueFactory(new PropertyValueFactory<BillingDetails, String>("lotNo"));
 
-		itemColdStore.setCellValueFactory((CellDataFeatures<InwardStockItem, String> data) -> {
+		itemColdStore.setCellValueFactory((CellDataFeatures<BillingDetails, String> data) -> {
 			jsonStockModel.makeListAndMapFromJson();
 			Optional<InwardStock> stock = ((InwardStockJsonModel) jsonStockModel).getStockList().stream()
 					.filter(stockObject -> stockObject.getStockId() == data.getValue().getStockId()
@@ -146,9 +142,9 @@ public class BillingController {
 
 			return new SimpleStringProperty(coldObject.get().getColdName());
 		});
-		
-		itemBhada.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("quantity"));
-		itemBillAmount.setCellValueFactory(new PropertyValueFactory<InwardStockItem, String>("quantity"));
+
+		itemBhada.setCellValueFactory(new PropertyValueFactory<BillingDetails, String>("bhada"));
+		itemBillAmount.setCellValueFactory(new PropertyValueFactory<BillingDetails, String>("totalBillAmount"));
 	}
 
 	private List<ColdStorage> getColdStoreList() {
@@ -162,5 +158,38 @@ public class BillingController {
 		demandTableQuantity.setCellValueFactory(new PropertyValueFactory<Demand, String>("quantity"));
 		demandTableChalanNumber.setCellValueFactory(new PropertyValueFactory<Demand, String>("chalanNumber"));
 		demandBillAmount.setCellValueFactory(new PropertyValueFactory<Demand, String>("billAmount"));
+	}
+
+	@FXML
+	private void billPaidAction() {
+		successMessage.setText("Bill Paid. Please check Paid Entries Tab for Paid Bills.");
+	}
+
+	@FXML
+	private void calculateBill() {
+		final BillingDetails billObject = stockListView.getSelectionModel().selectedItemProperty().get();
+		if (billObject == null)
+			successMessage.setText("Please select an entry to calculate bill in the Stock List View !!!");
+		else {
+			Integer bhada = Integer.parseInt(coldBhada.getText());
+			ArrayList<Integer> billList = new ArrayList<>();
+			demandListToShow.stream().forEach(demand -> {
+				Integer months = Period.between(billObject.getEntryDate(), demand.getDemandDate()).getMonths() + 1;
+				Integer bill = demand.getQuantity() * bhada * months;
+				demand.setBillAmount(bill);
+				((DemandJsonModel) jsonDemandHandler).setDemandMap(demand);
+				billList.add(bill);
+			});
+
+			billObject.setBhada(bhada);
+			billObject.setTotalBillAmount(billList.stream().mapToInt(i -> i).sum());
+			((BillingJsonModel) jsonBillingModel).setBillingMap(billObject);
+			jsonBillingModel.writeObjectToJson("Billing", ((BillingJsonModel) jsonBillingModel).getBillingMap());
+			jsonDemandHandler.writeObjectToJson("Demand", ((DemandJsonModel) jsonDemandHandler).getDemandMap());
+			populateBillingListView();
+			demandListTable.setItems(null);
+			successMessage.setText("Bill Generated. Please check respective entry for bill amount.");
+			coldBhada.setText("");
+		}
 	}
 }

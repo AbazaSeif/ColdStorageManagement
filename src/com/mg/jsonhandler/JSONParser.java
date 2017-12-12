@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mg.csms.beans.BillingDetails;
 import com.mg.csms.beans.ColdStorage;
 import com.mg.csms.beans.Demand;
 import com.mg.csms.beans.InwardStock;
@@ -54,6 +55,10 @@ public class JSONParser {
 					break;
 				case "ItemList":
 					objectMap = mapper.readValue(file, new TypeReference<Map<Integer, Item>>() {
+					});
+					break;
+				case "Billing":
+					objectMap = mapper.readValue(file, new TypeReference<Map<Integer, BillingDetails>>() {
 					});
 					break;
 				default:
