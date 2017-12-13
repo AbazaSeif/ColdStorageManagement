@@ -1,7 +1,7 @@
 package com.mg.controller;
 
 import java.sql.Date;
-import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +18,7 @@ import com.mg.json.model.DemandJsonModel;
 import com.mg.json.model.InwardStockJsonModel;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -73,7 +74,7 @@ public class BillingController {
 	private JsonHandlerInterface jsonStockModel;
 	private JsonHandlerInterface jsonColdHandler;
 	private JsonHandlerInterface jsonDemandHandler;
-	private List<BillingDetails> billingItemList;
+	protected List<BillingDetails> billingItemList;
 	private List<Demand> demandListToShow;
 	private JsonHandlerInterface jsonBillingModel;
 
@@ -103,8 +104,12 @@ public class BillingController {
 		jsonBillingModel.makeListAndMapFromJson();
 		billingItemList = ((BillingJsonModel) jsonBillingModel).getBillingList();
 		if (!billingItemList.isEmpty())
-			billingItemList.removeIf(item -> item.getIsPaid());
+			filterPaidElements();
 		stockListView.setItems(FXCollections.observableList(billingItemList));
+	}
+
+	protected void filterPaidElements() {
+		billingItemList.removeIf(item -> item.getIsPaid());
 	}
 
 	private void addTableRowAction() {
@@ -128,23 +133,24 @@ public class BillingController {
 		itemColdNo.setCellValueFactory(new PropertyValueFactory<BillingDetails, String>("coldNo"));
 		itemQuantity.setCellValueFactory(new PropertyValueFactory<BillingDetails, String>("quantity"));
 		itemLotNo.setCellValueFactory(new PropertyValueFactory<BillingDetails, String>("lotNo"));
-
-		itemColdStore.setCellValueFactory((CellDataFeatures<BillingDetails, String> data) -> {
-			jsonStockModel.makeListAndMapFromJson();
-			Optional<InwardStock> stock = ((InwardStockJsonModel) jsonStockModel).getStockList().stream()
-					.filter(stockObject -> stockObject.getStockId() == data.getValue().getStockId()
-							|| stockObject.getStockId().equals(data.getValue().getStockId()))
-					.findAny();
-			Optional<ColdStorage> coldObject = getColdStoreList().stream()
-					.filter(cold -> stock.get().getColdId() == cold.getColdId()
-							|| stock.get().getColdId().equals(cold.getColdId()))
-					.findAny();
-
-			return new SimpleStringProperty(coldObject.get().getColdName());
-		});
-
+		itemColdStore.setCellValueFactory((CellDataFeatures<BillingDetails, String> data) -> {return initializeColdStorageName(data);});
 		itemBhada.setCellValueFactory(new PropertyValueFactory<BillingDetails, String>("bhada"));
 		itemBillAmount.setCellValueFactory(new PropertyValueFactory<BillingDetails, String>("totalBillAmount"));
+	}
+
+	private ObservableValue<String> initializeColdStorageName(CellDataFeatures<BillingDetails, String> data) {
+		jsonStockModel.makeListAndMapFromJson();
+		Optional<InwardStock> stock = ((InwardStockJsonModel) jsonStockModel).getStockList().stream()
+				.filter(stockObject -> stockObject.getStockId() == data.getValue().getStockId()
+				|| stockObject.getStockId().equals(data.getValue().getStockId()))
+				.findAny();
+		Optional<ColdStorage> coldObject = getColdStoreList().stream()
+				.filter(cold -> stock.get().getColdId() == cold.getColdId()
+				|| stock.get().getColdId().equals(cold.getColdId()))
+				.findAny();
+		if(coldObject.isPresent())
+			return new SimpleStringProperty(coldObject.get().getColdName());
+		return null;
 	}
 
 	private List<ColdStorage> getColdStoreList() {
@@ -161,35 +167,58 @@ public class BillingController {
 	}
 
 	@FXML
-	private void billPaidAction() {
-		successMessage.setText("Bill Paid. Please check Paid Entries Tab for Paid Bills.");
+	private void calculateBill() {
+		BillingDetails billObject = stockListView.getSelectionModel().selectedItemProperty().get();
+		if (billObject == null)
+			successMessage.setText("Please select an entry to calculate bill in the above List View !!!");
+		else {
+			calculateBillForEachDemand(billObject);
+			writeUpdatedObjectsToJson(billObject);
+			refreshScreen();
+			successMessage.setText("Bill Generated. Please check respective entry for bill amount.");
+		}
+	}
+
+	private void writeUpdatedObjectsToJson(BillingDetails billObject) {
+		updateBillingMapAndWriteToJson(billObject);
+		jsonDemandHandler.writeObjectToJson("Demand", ((DemandJsonModel) jsonDemandHandler).getDemandMap());
+	}
+
+	private void calculateBillForEachDemand(BillingDetails billObject) {
+		Integer bhada = Integer.parseInt(coldBhada.getText());
+		ArrayList<Integer> billList = new ArrayList<>();
+		demandListToShow.stream().forEach(demand -> {
+			Integer months = (int)Math.ceil((double)ChronoUnit.DAYS.between(billObject.getEntryDate(), demand.getDemandDate())/30) + 1;
+			Integer bill = demand.getQuantity() * bhada * months;
+			demand.setBillAmount(bill);
+			((DemandJsonModel) jsonDemandHandler).setDemandMap(demand);
+			billList.add(bill);
+		});
+		billObject.setBhada(bhada);
+		billObject.setTotalBillAmount(billList.stream().mapToInt(i -> i).sum());
 	}
 
 	@FXML
-	private void calculateBill() {
+	private void billPaidAction() {
 		final BillingDetails billObject = stockListView.getSelectionModel().selectedItemProperty().get();
 		if (billObject == null)
-			successMessage.setText("Please select an entry to calculate bill in the Stock List View !!!");
+			successMessage.setText("Please select an entry to mark it as Paid in the above List View !!!");
 		else {
-			Integer bhada = Integer.parseInt(coldBhada.getText());
-			ArrayList<Integer> billList = new ArrayList<>();
-			demandListToShow.stream().forEach(demand -> {
-				Integer months = Period.between(billObject.getEntryDate(), demand.getDemandDate()).getMonths() + 1;
-				Integer bill = demand.getQuantity() * bhada * months;
-				demand.setBillAmount(bill);
-				((DemandJsonModel) jsonDemandHandler).setDemandMap(demand);
-				billList.add(bill);
-			});
-
-			billObject.setBhada(bhada);
-			billObject.setTotalBillAmount(billList.stream().mapToInt(i -> i).sum());
-			((BillingJsonModel) jsonBillingModel).setBillingMap(billObject);
-			jsonBillingModel.writeObjectToJson("Billing", ((BillingJsonModel) jsonBillingModel).getBillingMap());
-			jsonDemandHandler.writeObjectToJson("Demand", ((DemandJsonModel) jsonDemandHandler).getDemandMap());
-			populateBillingListView();
-			demandListTable.setItems(null);
-			successMessage.setText("Bill Generated. Please check respective entry for bill amount.");
-			coldBhada.setText("");
+			billObject.setIsPaid(true);
+			updateBillingMapAndWriteToJson(billObject);
+			refreshScreen();
+			successMessage.setText("Bill marked paid. Please check Paid Entries Tab for Paid Bills.");
 		}
+	}
+
+	private void updateBillingMapAndWriteToJson(final BillingDetails billObject) {
+		((BillingJsonModel) jsonBillingModel).setBillingMap(billObject);
+		jsonBillingModel.writeObjectToJson("Billing", ((BillingJsonModel) jsonBillingModel).getBillingMap());
+	}
+
+	private void refreshScreen() {
+		populateBillingListView();
+		demandListTable.setItems(null);
+		coldBhada.setText("");
 	}
 }

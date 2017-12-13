@@ -1,18 +1,14 @@
 package com.mg.csms;
 
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Map;
+import java.time.temporal.ChronoUnit;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mg.csms.beans.ColdStorage;
 
 public class TestMain {
 
 	public static void main(String[] args) {
-		ColdStorage coldObject = makeColdObject();
+		/*ColdStorage coldObject = makeColdObject();
 		ColdStorage coldObject1 = makeColdObject1();
 		ObjectMapper mapper = new ObjectMapper();
 		File file = new File("D:\\cold.json");
@@ -35,7 +31,14 @@ public class TestMain {
 			System.out.println(coldMap.size());
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
+
+		LocalDate endofCentury = LocalDate.of(2018, 12, 01);
+		LocalDate now = LocalDate.now();
+
+		System.out.println(ChronoUnit.DAYS.between(now, endofCentury));
+		System.out.println((int)Math.ceil((double)ChronoUnit.DAYS.between(now, endofCentury)/30));
+
 	}
 
 	private static ColdStorage makeColdObject() {

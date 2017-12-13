@@ -23,6 +23,8 @@ public class LoadTabFxmlActionController {
 	@FXML
 	private Tab billingTab;
 	@FXML
+	private Tab paidBillTab;
+	@FXML
 	private Tab demandTab;
 	@FXML
 	private Tab coldVyaapariTab;
@@ -37,6 +39,7 @@ public class LoadTabFxmlActionController {
 		stockinHandTab.setOnSelectionChanged(event -> loadTabBasedFXML(stockinHandTab, "/view/StockInHand.fxml"));
 		demandTab.setOnSelectionChanged(event -> loadTabBasedFXML(demandTab, "/view/Demand.fxml"));
 		billingTab.setOnSelectionChanged(event -> loadTabBasedFXML(billingTab, "/view/Billing.fxml"));
+		paidBillTab.setOnSelectionChanged(event -> loadTabBasedFXML(paidBillTab, "/view/PaidBill.fxml"));
 		coldVyaapariTab.setOnSelectionChanged(event -> loadTabBasedFXML(coldVyaapariTab, "/view/ColdStorage.fxml"));
 		completedstocksTab.setOnSelectionChanged(event -> loadTabBasedFXML(completedstocksTab, "/view/CompletedStocks.fxml"));
 		addItemTab.setOnSelectionChanged(event -> loadTabBasedFXML(addItemTab, "/view/AddItem.fxml"));
