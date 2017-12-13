@@ -23,9 +23,6 @@
             <AnchorPane fx:id="apDesignPane" maxHeight="-1.0" maxWidth="-1.0">
               <children>
                 <Label layoutX="38.0" layoutY="14.0" prefHeight="56.0" prefWidth="559.0" text="Stock Management System" textFill="#569900">
-                  <effect>
-                    <Reflection bottomOpacity="0.04" fraction="0.6" topOpacity="0.32" />
-                  </effect>
                   <font>
                     <Font name="System Bold" size="31.0" />
                   </font>
@@ -63,7 +60,7 @@
                     <Font name="System Italic" size="16.0" />
                   </font>
                 </Text>
-                        <Text fill="#660000" layoutX="14.0" layoutY="338.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Developed By: MOHAK GUPTA OWNER- ATTI UTTAM" wrappingWidth="238.99999513477087">
+                        <Text fill="#660000" layoutX="14.0" layoutY="330.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Developed By: MOHAK GUPTA OWNER- ATTI UTTAM" wrappingWidth="238.99999513477087">
                            <font>
                               <Font name="System Italic" size="16.0" />
                            </font>
